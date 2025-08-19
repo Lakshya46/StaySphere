@@ -1,5 +1,10 @@
 
 const User = require("../models/user");
+const Booking =require("../models/booking");
+const Listing = require("../models/listing");
+
+
+
 
 module.exports.renderSignUp = (req ,res)=>{
 

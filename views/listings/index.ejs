@@ -64,45 +64,5 @@
 
   </div>
 
-  <!-- Custom CSS -->
-  <style>
-    /* Hover effect on cards */
-    .listing-card {
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .listing-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    /* Button hover effects */
-    .like-btn:hover {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    .wishlist-btn:hover {
-      background-color: #0d6efd;
-      color: white;
-    }
-  </style>
-
-</body>
-<script>
-document.querySelectorAll(".like-form").forEach(form => {
-  form.querySelector(".like-btn").addEventListener("click", async () => {
-    let id = form.dataset.id;
-    await fetch(`/listings/${id}/like`, { method: "POST" });
-    form.querySelector("i").classList.toggle("fa-solid");
-  });
-});
-
-document.querySelectorAll(".wishlist-form").forEach(form => {
-  form.querySelector(".wishlist-btn").addEventListener("click", async () => {
-    let id = form.dataset.id;
-    await fetch(`/listings/${id}/wishlist`, { method: "POST" });
-    form.querySelector("i").classList.toggle("fa-solid");
-  });
-});
-</script>
+  </body>
+  

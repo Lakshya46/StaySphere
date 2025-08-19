@@ -1,0 +1,25 @@
+<% if(success && success.length ){ %>
+<div class="d-flex justify-content-center mt-4">
+  <div class="alert alert-success alert-dismissible fade show shadow-lg rounded-3 px-4 py-3 col-md-6 text-center" role="alert">
+    <div class="d-flex align-items-center justify-content-between">
+      <span class="fw-semibold"> <%= success %>
+      </span>
+      <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<% if(error && error.length ){ %>
+<div class="d-flex justify-content-center mt-4">
+  <div class="alert alert-danger alert-dismissible fade show shadow-lg rounded-3 px-4 py-3 col-md-6 text-center" role="alert">
+    <div class="d-flex align-items-center justify-content-between">
+      <span class="fw-semibold"> <%= error %>
+      </span>
+      <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<% } %>
+
+

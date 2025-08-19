@@ -1,0 +1,104 @@
+.navbar{
+    height: 5rem;
+    background-color: white;
+}
+body {
+font-family: "Plus Jakarta Sans", sans-serif !important;
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+}
+.container{
+    flex: 1;
+}
+.fa-compass{
+    color:rgb(210, 36, 9) ;
+    font-size: 2rem;
+}
+.nav-link{
+    color: black !important;
+}
+.f-info-links a {
+    text-decoration: none;
+    color: red;
+}
+.f-info-links a:hover{
+    text-decoration: underline;
+
+}
+
+.f-info-socials , .f-info-links , .f-info-brand{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: red;
+
+}
+.f-info-socials i {
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.f-info {
+    height: 8rem;
+    text-align: center;
+    align-items: normal;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+}
+
+
+.listing-card{
+    border : none !important;
+    margin-bottom: 2rem;
+    
+
+}
+.card-img-top{
+    border-radius: 1rem !important;
+    width: 100% !important;
+    object-fit: cover !important;
+}
+
+.card-body{
+    padding: 0 !important;
+    color: rgb(0, 1, 17) !important;
+}
+
+
+.listing-link{
+    text-decoration: none;
+}
+
+.card-img-overlay {
+    opacity: 0;
+}
+.card-img-overlay:hover{
+opacity: 0.2;
+background-color: rgb(255, 255, 255);
+}
+
+.btn{
+    color: white !important;
+    background-color: #ff0404 !important;
+    
+}
+
+.show-img {
+    height: 40vh;
+    
+}
+
+.btns{
+    display: flex;
+}
+
+
+
+
+
+ 

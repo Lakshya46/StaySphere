@@ -1,0 +1,32 @@
+
+
+
+<% layout("./layouts/boilerplate") %>
+<div class="container mt-5">
+  <h2>Pending Bookings</h2>
+
+  <% if (bookings.length === 0) { %>
+    <div class="alert alert-info">No pending bookings.</div>
+  <% } else { %>
+    <% bookings.forEach(booking => { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5><%= booking.listing.title %></h5>
+          <p>
+            <strong>User:</strong> <%= booking.user.username %><br>
+            <strong>Check-In:</strong> <%= booking.startDate ? booking.startDate.toDateString() : "" %><br>
+            <strong>Check-Out:</strong> <%= booking.endDate ? booking.endDate.toDateString() : "" %><br>
+            <strong>Guests:</strong> <%= booking.guests %><br>
+            <strong>Total:</strong> $<%= booking.totalPrice %>
+          </p>
+          <form action="/users/<%= booking._id %>/approve" method="POST" class="d-inline">
+            <button class="btn btn-success btn-sm">Approve</button>
+          </form>
+          <form action="/users/<%= booking._id %>/reject" method="POST" class="d-inline">
+            <button class="btn btn-danger btn-sm">Reject</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>

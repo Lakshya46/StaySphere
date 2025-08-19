@@ -1,0 +1,86 @@
+<% layout("./layouts/boilerplate") %>
+
+         <style>
+        .booking-btn:hover {
+            background-color: var(--light-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .booking-btn i {
+            transition: var(--transition);
+        }
+        
+        .booking-btn:hover i {
+            transform: translateX(5px);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-card {
+                max-width: 100%;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .profile-img {
+                height: 180px;
+            }
+        }
+    </style>
+  <div class="profile-container">
+        <div class="profile-header">
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="profile-card">
+                    <img src="<%= user.avatar || 'https://placehold.co/600x400/ececec/4361ee' %>" class="card-img-top profile-img" alt="Profile picture of <%= user.username %>">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= user.username %></h5>
+                        
+                        <div class="profile-detail">
+                            <strong>Email:</strong>
+                            <span><%= user.email %></span>
+                        </div>
+                        
+                        <div class="profile-detail">
+                            <strong>Joined:</strong>
+                            <span><%= user.createdAt ? new Date(user.createdAt).toDateString() : "N/A" %></span>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="/users/profile/edit" class="btn btn-primary btn-edit">
+                                <i class="fas fa-pencil-alt me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="bookings-section">
+                    <h4 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>Booking Management</h4>
+                    
+                    <form method="GET" action="/users/my-listings/bookings">
+                        <button type="submit" class="booking-btn">
+                            <span><i class="fas fa-clock me-2"></i> View Pending Bookings</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </form>
+                    
+                    <form method="GET" action="/users/guests">
+                        <button type="submit" class="booking-btn">
+                            <span><i class="fas fa-list me-2"></i> View My Bookings</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+

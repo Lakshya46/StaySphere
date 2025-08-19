@@ -1,0 +1,88 @@
+<% layout("./layouts/boilerplate") %>
+<div class="container mt-5">
+  <h2 class="mb-4">My Bookings</h2>
+
+  <% if (!bookings || bookings.length === 0) { %>
+    <div class="alert alert-info">You don’t have any bookings yet.</div>
+  <% } else { %>
+    <div class="row">
+      <% bookings.forEach(booking => { %>
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm h-100">
+            
+            <!-- Listing Image -->
+            <% if (booking.listing && booking.listing.image && booking.listing.image.url) { %>
+              <img src="<%= booking.listing.image.url %>" 
+                   class="card-img-top" 
+                   alt="<%= booking.listing.title %>" 
+                   style="height:200px; object-fit:cover;">
+            <% } else { %>
+              <img src="https://via.placeholder.com/400x200?text=No+Image"
+                   class="card-img-top"
+                   alt="No image">
+            <% } %>
+
+            <div class="card-body">
+              <!-- Listing Title -->
+              <h5 class="card-title">
+                <% if (booking.listing) { %>
+                  <a href="/listings/<%= booking.listing._id %>" class="text-decoration-none">
+                    <%= booking.listing.title %>
+                  </a>
+                <% } else { %>
+                  <span class="text-muted">Listing not available</span>
+                <% } %>
+              </h5>
+
+              <!-- Location -->
+              <% if (booking.listing) { %>
+                <p class="text-muted">
+                  <i class="fas fa-map-marker-alt"></i> 
+                  <%= booking.listing.location %>, <%= booking.listing.country %>
+                </p>
+              <% } %>
+
+              <!-- Booking Info -->
+              <p>
+                <% if (booking.startDate) { %>
+                  <strong>Check-In:</strong> <%= new Date(booking.startDate).toDateString() %><br>
+                <% } %>
+
+                <% if (booking.endDate) { %>
+                  <strong>Check-Out:</strong> <%= new Date(booking.endDate).toDateString() %><br>
+                <% } %>
+
+                <strong>Guests:</strong> <%= booking.guests || "N/A" %><br>
+                <strong>Total Price:</strong> $<%= booking.totalPrice || "N/A" %>
+              </p>
+
+              <!-- Status Badge -->
+              <p>
+                <strong>Status:</strong>
+                <span class="badge 
+                  <%= booking.status === 'confirmed' ? 'bg-success' 
+                  : booking.status === 'pending' ? 'bg-warning text-dark' 
+                  : 'bg-danger' %>">
+                  <%= booking.status %>
+                </span>
+              </p>
+
+           
+
+              <!-- Cancel Booking Button -->
+              <% if (booking.status !== "cancelled") { %>
+                <form method="POST" 
+                      action="/listings/<%= booking.listing._id %>/booking/<%= booking._id %>?_method=DELETE"
+                      class="d-inline">
+                  <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+

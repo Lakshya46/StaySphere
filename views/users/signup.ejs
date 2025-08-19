@@ -1,0 +1,54 @@
+
+<% layout("./layouts/boilerplate.ejs") %>
+
+<div class="row mt-3 justify-content-center">
+  <h3 class="text-center mb-4">Sign Up on StaySphere</h3>
+  
+  <div class="col-md-6">
+    <form action="/users/signup" method="post" class="needs-validation" novalidate>
+      
+      <!-- Required -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username *</label>
+        <input class="form-control" id="username" name="username" type="text" required />
+        <div class="invalid-feedback">Please enter a valid username.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email *</label>
+        <input class="form-control" id="email" name="email" type="email" required />
+        <div class="invalid-feedback">Please enter a valid email.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password *</label>
+        <input class="form-control" id="password" name="password" type="password" required />
+        <div class="invalid-feedback">Please enter a valid password.</div>
+      </div>
+
+      <!-- Optional Profile Fields -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Full Name</label>
+        <input class="form-control" id="name" name="name" type="text" />
+      </div>
+
+      
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input class="form-control" id="phone" name="phone" type="text" />
+      </div>
+
+      
+
+      
+
+      <div class="mb-3">
+        <label for="dob" class="form-label">Date of Birth</label>
+        <input class="form-control" id="dob" name="dob" type="date" />
+      </div>
+
+      <button class="btn btn-primary w-100">Sign Up</button>
+    </form>
+  </div>
+</div>

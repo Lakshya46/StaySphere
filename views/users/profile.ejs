@@ -1,86 +1,154 @@
 <% layout("./layouts/boilerplate") %>
 
-         <style>
-        .booking-btn:hover {
-            background-color: var(--light-color);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            color: var(--primary-color);
+<style>
+    .profile-container {
+        padding: 2rem;
+    }
+
+    .profile-card {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #fff;
+    }
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+
+    .profile-img {
+        height: 220px;
+        width: 220px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 5px solid var(--light-color);
+        margin: 1rem auto;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+    .profile-img:hover {
+        transform: scale(1.05);
+    }
+
+    .card-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .profile-detail {
+        margin: 0.6rem 0;
+        font-size: 1rem;
+    }
+    .profile-detail strong {
+        color: var(--primary-color);
+        margin-right: 0.4rem;
+    }
+
+    .btn-edit {
+        margin-top: 1rem;
+        border-radius: 50px;
+        padding: 0.6rem 1.4rem;
+        font-weight: 500;
+    }
+
+    /* Booking Buttons */
+    .bookings-section h4 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .booking-btn {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.2rem;
+        border-radius: 0.75rem;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #333;
+        background: #f9f9f9;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+    .booking-btn:hover {
+        background: var(--primary-color);
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .booking-btn i {
+        transition: transform 0.3s ease;
+    }
+    .booking-btn:hover i {
+        transform: translateX(5px);
+    }
+
+    @media (max-width: 768px) {
+        .profile-card {
+            margin-bottom: 2rem;
         }
-        
-        .booking-btn i {
-            transition: var(--transition);
+        .profile-img {
+            height: 160px;
+            width: 160px;
         }
-        
-        .booking-btn:hover i {
-            transform: translateX(5px);
-        }
-        
-        @media (max-width: 768px) {
-            .profile-card {
-                max-width: 100%;
-            }
-            
-            .card-body {
-                padding: 1.5rem;
-            }
-            
-            .profile-img {
-                height: 180px;
-            }
-        }
-    </style>
-  <div class="profile-container">
-        <div class="profile-header">
-        </div>
-        
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="profile-card">
-                    <img src="<%= user.avatar || 'https://placehold.co/600x400/ececec/4361ee' %>" class="card-img-top profile-img" alt="Profile picture of <%= user.username %>">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= user.username %></h5>
-                        
-                        <div class="profile-detail">
-                            <strong>Email:</strong>
-                            <span><%= user.email %></span>
-                        </div>
-                        
-                        <div class="profile-detail">
-                            <strong>Joined:</strong>
-                            <span><%= user.createdAt ? new Date(user.createdAt).toDateString() : "N/A" %></span>
-                        </div>
-                        
-                        <div class="text-center">
-                            <a href="/users/profile/edit" class="btn btn-primary btn-edit">
-                                <i class="fas fa-pencil-alt me-2"></i>Edit Profile
-                            </a>
-                        </div>
-                    </div>
+    }
+</style>
+
+<div class="profile-container">
+    <div class="row justify-content-center">
+        <!-- Profile Card -->
+        <div class="col-md-5">
+            <div class="profile-card text-center p-4">
+                <img src="<%= user.avatar || 'https://placehold.co/400x400/ececec/4361ee' %>" 
+                     class="profile-img" 
+                     alt="Profile picture of <%= user.username %>">
+
+                <h5 class="card-title"><%= user.username %></h5>
+
+                <div class="profile-detail">
+                    <strong>Email:</strong> <span><%= user.email %></span>
                 </div>
+                <div class="profile-detail">
+                    <strong>Joined:</strong> 
+                    <span><%= user.createdAt ? new Date(user.createdAt).toDateString() : "N/A" %></span>
+                </div>
+
+                <a href="/users/profile/edit" class="btn btn-primary btn-edit">
+                    <i class="fas fa-pencil-alt me-2"></i>Edit Profile
+                </a>
             </div>
-            
-            <div class="col-md-6">
-                <div class="bookings-section">
-                    <h4 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>Booking Management</h4>
-                    
-                    <form method="GET" action="/users/my-listings/bookings">
-                        <button type="submit" class="booking-btn">
-                            <span><i class="fas fa-clock me-2"></i> View Pending Bookings</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </form>
-                    
-                    <form method="GET" action="/users/guests">
-                        <button type="submit" class="booking-btn">
-                            <span><i class="fas fa-list me-2"></i> View My Bookings</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </form>
-                </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="col-md-5">
+            <div class="bookings-section">
+                <h4><i class="fas fa-calendar-alt me-2"></i> Booking Management</h4>
+
+                <form method="GET" action="/users/my-listings/bookings">
+                    <button type="submit" class="booking-btn">
+                        <span><i class="fas fa-clock me-2"></i> View Pending Bookings</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </form>
+
+                <form method="GET" action="/users/guests">
+                    <button type="submit" class="booking-btn">
+                        <span><i class="fas fa-list me-2"></i> View My Guests</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
-
+</div>
 
 

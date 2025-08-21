@@ -1,32 +1,51 @@
-
-
-
 <% layout("./layouts/boilerplate") %>
 <div class="container mt-5">
-  <h2>Pending Bookings</h2>
+  <h2 class="text-center mb-4">
+    <i class="bi bi-hourglass-split text-warning"></i> Pending Bookings
+  </h2>
 
   <% if (bookings.length === 0) { %>
-    <div class="alert alert-info">No pending bookings.</div>
+    <div class="alert alert-info text-center shadow-sm">
+      <i class="bi bi-info-circle"></i> No pending bookings right now.
+    </div>
   <% } else { %>
-    <% bookings.forEach(booking => { %>
-      <div class="card mb-3">
-        <div class="card-body">
-          <h5><%= booking.listing.title %></h5>
-          <p>
-            <strong>User:</strong> <%= booking.user.username %><br>
-            <strong>Check-In:</strong> <%= booking.startDate ? booking.startDate.toDateString() : "" %><br>
-            <strong>Check-Out:</strong> <%= booking.endDate ? booking.endDate.toDateString() : "" %><br>
-            <strong>Guests:</strong> <%= booking.guests %><br>
-            <strong>Total:</strong> $<%= booking.totalPrice %>
-          </p>
-          <form action="/users/<%= booking._id %>/approve" method="POST" class="d-inline">
-            <button class="btn btn-success btn-sm">Approve</button>
-          </form>
-          <form action="/users/<%= booking._id %>/reject" method="POST" class="d-inline">
-            <button class="btn btn-danger btn-sm">Reject</button>
-          </form>
+    <div class="row">
+      <% bookings.forEach(booking => { %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="card-title text-primary">
+                <i class="bi bi-house-door-fill"></i> <%= booking.listing.title %>
+              </h5>
+              <p class="card-text">
+                <span class="badge bg-secondary mb-2">
+                  <i class="bi bi-person-fill"></i> <%= booking.user.username %>
+                </span><br>
+                <strong>Check-In:</strong> 
+                <span class="text-success"><%= booking.startDate ? booking.startDate.toDateString() : "" %></span><br>
+                <strong>Check-Out:</strong> 
+                <span class="text-danger"><%= booking.endDate ? booking.endDate.toDateString() : "" %></span><br>
+                <strong>Guests:</strong> <%= booking.guests %><br>
+                <strong>Total:</strong> 
+                <span class="fw-bold text-dark">₹<%= booking.totalPrice %></span>
+              </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between bg-light">
+              <form action="/users/<%= booking._id %>/approve" method="POST">
+                <button class="btn btn-success btn-sm w-100">
+                  <i class="bi bi-check-circle"></i> Approve
+                </button>
+              </form>
+              <form action="/users/<%= booking._id %>/reject" method="POST">
+                <button class="btn btn-danger btn-sm w-100 ms-2">
+                  <i class="bi bi-x-circle"></i> Reject
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-      </div>
-    <% }) %>
+      <% }) %>
+    </div>
   <% } %>
 </div>
+

@@ -110,7 +110,6 @@ module.exports.userBookings = async (req, res) => {
 
     res.render("booking/myBookings", { bookings });
 };
-
 module.exports.approveBooking = async (req, res) => {
     const booking = await Booking.findById(req.params.bookingId).populate("listing");
 
@@ -129,8 +128,9 @@ module.exports.approveBooking = async (req, res) => {
         return res.redirect("back");
     }
 
-    booking.status = "confirmed";
-    await booking.save();
+    // ✅ only update status instead of saving entire document
+    await Booking.findByIdAndUpdate(req.params.bookingId, { status: "confirmed" });
+
     req.flash("success", "Booking approved!");
     res.redirect("/users/my-listings/bookings");
 };

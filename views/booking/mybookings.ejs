@@ -26,7 +26,7 @@
               <!-- Listing Title -->
               <h5 class="card-title">
                 <% if (booking.listing) { %>
-                  <a href="/listings/<%= booking.listing._id %>" class="text-decoration-none">
+                  <a href="/listings/<%= booking.listing._id %>" class="text-decoration-none fw-bold">
                     <%= booking.listing.title %>
                   </a>
                 <% } else { %>
@@ -36,14 +36,14 @@
 
               <!-- Location -->
               <% if (booking.listing) { %>
-                <p class="text-muted">
+                <p class="text-muted mb-2">
                   <i class="fas fa-map-marker-alt"></i> 
                   <%= booking.listing.location %>, <%= booking.listing.country %>
                 </p>
               <% } %>
 
               <!-- Booking Info -->
-              <p>
+              <p class="small mb-2">
                 <% if (booking.startDate) { %>
                   <strong>Check-In:</strong> <%= new Date(booking.startDate).toDateString() %><br>
                 <% } %>
@@ -67,15 +67,15 @@
                 </span>
               </p>
 
-           
-
               <!-- Cancel Booking Button -->
-              <% if (booking.status !== "cancelled") { %>
+              <% if (booking.status !== "cancelled" && booking.listing) { %>
                 <form method="POST" 
                       action="/listings/<%= booking.listing._id %>/booking/<%= booking._id %>?_method=DELETE"
                       class="d-inline">
                   <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                 </form>
+              <% } else if (!booking.listing) { %>
+                <span class="text-muted small">Cannot manage booking (listing removed)</span>
               <% } %>
             </div>
           </div>
@@ -84,5 +84,3 @@
     </div>
   <% } %>
 </div>
-
-

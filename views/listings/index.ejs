@@ -2,61 +2,49 @@
 
 <body class="bg-light">
 
-  <div class="container my-4">
+  <div class="container py-5">
 
+    <!-- Heading -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Explore Stays</h2>
+      <p class="text-muted">Find your perfect stay at the best prices</p>
+    </div>
+
+    <!-- Listings Grid -->
     <div class="row g-4">
       <% for (let list of allListing) { %>
         <div class="col-lg-4 col-md-6 col-sm-12">
-          <div class="card shadow-sm border-0 rounded-3 h-100 listing-card position-relative">
+          <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden listing-card transition">
 
             <!-- Listing Image -->
             <a href="/listings/<%= list._id %>" class="text-decoration-none">
               <img 
                 src="<%= list.image?.url || '/images/default.jpg' %>" 
-                class="card-img-top rounded-top" 
+                class="card-img-top" 
                 alt="<%= list.title || 'Listing Image' %>" 
-                style="height: 220px; object-fit: cover;"
+                style="height: 250px; object-fit: cover; transition: transform 0.3s ease;"
+                onmouseover="this.style.transform='scale(1.05)'"
+                onmouseout="this.style.transform='scale(1)'"
               >
-            </a>
+           
 
             <!-- Card Body -->
             <div class="card-body d-flex flex-column">
 
               <!-- Title -->
-              <h5 class="card-title text-dark fw-semibold">
+              <h5 class="card-title fw-semibold text-dark text-truncate">
                 <%= list.title %>
               </h5>
 
               <!-- Price -->
-              <p class="card-text text-muted mb-2">
-                &#x20b9; 
-                <%= list.price ? list.price.toLocaleString("en-IN") : "N/A" %> / Night
+              <p class="card-text text-muted mb-3">
+                <span class="fw-bold text-dark">&#x20b9; <%= list.price ? list.price.toLocaleString("en-IN") : "N/A" %></span> / night
               </p>
 
-              <!-- Action Buttons -->
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-
-                <!-- Like Button -->
-                <form action="/listings/<%= list._id %>/like" method="POST" class="me-2">
-                  <button type="submit" 
-                          class="btn btn-outline-danger btn-sm rounded-circle shadow-sm like-btn"
-                          aria-label="Like Listing">
-                    <i class="fa-regular fa-heart"></i>
-                  </button>
-                </form>
-
-                <!-- Wishlist Button -->
-                <form action="/listings/<%= list._id %>/wishlist" method="POST">
-                  <button type="submit" 
-                          class="btn btn-outline-primary btn-sm rounded-circle shadow-sm wishlist-btn"
-                          aria-label="Add to Wishlist">
-                    <i class="fa-regular fa-bookmark"></i>
-                  </button>
-                </form>
-
-              </div>
-
+              
+              
             </div>
+             </a>
           </div>
         </div>
       <% } %>
@@ -64,5 +52,4 @@
 
   </div>
 
-  </body>
-  
+</body>

@@ -1,0 +1,71 @@
+<% layout("./layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <h3 class="mb-4 text-primary"><i class="fas fa-suitcase me-2"></i>Upcoming Stays</h3>
+
+  <% if(bookings.length === 0){ %>
+    <div class="alert alert-info">No upcoming stays.</div>
+  <% } else { %>
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle mb-0">
+        <thead style="background: linear-gradient(90deg, #008cff, #00d4ff); color: #fff;">
+          <tr>
+            <th class="ps-4">Property</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Total Price</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(b => { %>
+            <tr class="booking-row" style="cursor: pointer;" 
+                onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'">
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-2">
+                  <% if(b.listing.featuredImage){ %>
+                    <img src="<%= b.listing.featuredImage.url %>" alt="property" class="rounded-2" style="width: 60px; height: 45px; object-fit: cover;">
+                  <% } %>
+                  <span class="fw-semibold text-dark"><%= b.listing.title %></span>
+                </div>
+              </td>
+              <td class="text-secondary"><%= new Date(b.startDate).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) %></td>
+              <td class="text-secondary"><%= new Date(b.endDate).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) %></td>
+              <td class="fw-bold text-success">₹<%= b.totalPrice.toLocaleString("en-IN") %></td>
+              <td class="fw-semibold">
+                <% if(b.status === 'confirmed'){ %>
+                  <span class="text-success">Confirmed</span>
+                <% } else if(b.status === 'pending'){ %>
+                  <span class="text-warning">Pending</span>
+                <% } else { %>
+                  <span class="text-danger">Cancelled</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<style>
+.booking-row:hover {
+  background-color: #e6f2ff;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover td {
+  color: #000;
+}
+
+.table td img {
+  border: 1px solid #ddd;
+  padding: 2px;
+}
+</style>

@@ -1,0 +1,34 @@
+<% layout("./layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <h3 class="mb-4"><i class="fas fa-history me-2"></i>Past Guest Bookings</h3>
+
+  <% if(bookings.length === 0){ %>
+    <p>No past bookings.</p>
+  <% } else { %>
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Guest</th>
+          <th>Property</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Total Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bookings.forEach(b => { %>
+          <tr>
+            <td><%= b.user.username %></td>
+            <td><%= b.listing.title %></td>
+            <td><%= new Date(b.startDate).toLocaleDateString() %></td>
+            <td><%= new Date(b.endDate).toLocaleDateString() %></td>
+            <td>₹<%= b.totalPrice.toLocaleString("en-IN") %></td>
+            <td><%= b.status %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

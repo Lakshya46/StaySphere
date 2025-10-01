@@ -2,54 +2,142 @@
 
 <body class="bg-light">
 
-  <div class="container py-5">
+<div class="container py-5">
 
-    <!-- Heading -->
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Explore Stays</h2>
-      <p class="text-muted">Find your perfect stay at the best prices</p>
-    </div>
+  <!-- Heading -->
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">Explore Stays</h2>
+    <p class="text-muted">Find your perfect stay for students and professionals at the best prices</p>
+  </div>
 
-    <!-- Listings Grid -->
-    <div class="row g-4">
-      <% for (let list of allListing) { %>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-          <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden listing-card transition">
+  <!-- Search & Filter -->
+  <div class="card mb-5 p-4 shadow-sm rounded-4">
+    <form method="GET" action="/listings" class="row g-3 align-items-end">
 
-            <!-- Listing Image -->
-            <a href="/listings/<%= list._id %>" class="text-decoration-none">
-              <img 
-                src="<%= list.image?.url || '/images/default.jpg' %>" 
-                class="card-img-top" 
-                alt="<%= list.title || 'Listing Image' %>" 
-                style="height: 250px; object-fit: cover; transition: transform 0.3s ease;"
-                onmouseover="this.style.transform='scale(1.05)'"
-                onmouseout="this.style.transform='scale(1)'"
-              >
-           
+      <!-- Search Fields -->
+      <div class="col-md-3">
+        <label class="form-label">Search</label>
+        <input type="text" name="q" class="form-control" placeholder="Search by title or keywords" value="<%= query?.q || '' %>">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">City / Area</label>
+        <input type="text" name="city" class="form-control" placeholder="Delhi, Mumbai..." value="<%= query?.city || '' %>">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Min Price (₹)</label>
+        <input type="number" name="minPrice" class="form-control" min="0" value="<%= query?.minPrice || '' %>">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Max Price (₹)</label>
+        <input type="number" name="maxPrice" class="form-control" min="0" value="<%= query?.maxPrice || '' %>">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">BHK Type</label>
+        <select class="form-select" name="bhkType">
+          <option value="">Any</option>
+          <option value="1BHK" <%= query?.bhkType==='1BHK'?'selected':'' %>>1BHK</option>
+          <option value="2BHK" <%= query?.bhkType==='2BHK'?'selected':'' %>>2BHK</option>
+          <option value="3BHK" <%= query?.bhkType==='3BHK'?'selected':'' %>>3BHK</option>
+          <option value="4BHK+" <%= query?.bhkType==='4BHK+'?'selected':'' %>>4BHK+</option>
+          <option value="Studio" <%= query?.bhkType==='Studio'?'selected':'' %>>Studio</option>
+        </select>
+      </div>
+
+      <!-- Amenities -->
+      <div class="col-12">
+        <label class="form-label">Amenities</label><br>
+        <% const allAmenities = ["WiFi", "AC", "Parking"]; %>
+        <% allAmenities.forEach(function(amenity){ %>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="amenities" value="<%= amenity %>"
+              <%= query?.amenities && (Array.isArray(query.amenities)? query.amenities.includes(amenity) : query.amenities===amenity)?'checked':'' %>>
+            <label class="form-check-label"><%= amenity %></label>
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary">Search / Filter</button>
+        <a href="/listings" class="btn btn-outline-secondary ms-2">Reset</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Listings Grid -->
+  <div class="row g-4">
+    <% allListing.forEach(function(list){ %>
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden listing-card hover-scale">
+
+          <a href="/listings/<%= list._id %>" class="text-decoration-none">
+
+            <!-- Carousel -->
+            <div id="carousel<%= list._id %>" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                <% if(list.featuredImage){ %>
+                  <div class="carousel-item active">
+                    <img src="<%= list.featuredImage.url %>" class="d-block w-100" alt="<%= list.title %>" style="height:250px; object-fit:cover;">
+                  </div>
+                <% } %>
+                <% if(list.images && list.images.length>0){ %>
+                  <% list.images.forEach(function(img){ %>
+                    <div class="carousel-item <%= !list.featuredImage?'active':'' %>">
+                      <img src="<%= img.url %>" class="d-block w-100" alt="<%= list.title %>" style="height:250px; object-fit:cover;">
+                    </div>
+                  <% }); %>
+                <% } %>
+              </div>
+
+              <% if ((list.images && list.images.length>0) || list.featuredImage) { %>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= list._id %>" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= list._id %>" data-bs-slide="next">
+                  <span class="carousel-control-next-icon"></span>
+                </button>
+              <% } %>
+            </div>
 
             <!-- Card Body -->
             <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-semibold text-dark text-truncate"><%= list.title %></h5>
 
-              <!-- Title -->
-              <h5 class="card-title fw-semibold text-dark text-truncate">
-                <%= list.title %>
-              </h5>
+              <!-- BHK & Price Badges -->
+              <div class="mb-2">
+                <% if(list.bhkType){ %>
+                  <span class="badge bg-primary me-1"><i class="fa-solid fa-bed me-1"></i> <%= list.bhkType %></span>
+                <% } %>
+                <span class="badge bg-success">&#x20b9; <%= list.price?.toLocaleString("en-IN") || "N/A" %> / month</span>
+              </div>
 
-              <!-- Price -->
-              <p class="card-text text-muted mb-3">
-                <span class="fw-bold text-dark">&#x20b9; <%= list.price ? list.price.toLocaleString("en-IN") : "N/A" %></span> / night
-              </p>
-
-              
-              
+              <!-- Location -->
+              <p class="text-secondary small mb-0"><i class="fa-solid fa-location-dot me-1"></i> <%= list.area %>, <%= list.city %></p>
             </div>
-             </a>
-          </div>
-        </div>
-      <% } %>
-    </div>
 
+          </a>
+        </div>
+      </div>
+    <% }); %>
   </div>
+
+</div>
+
+<style>
+.hover-scale:hover {
+  transform: scale(1.03);
+  transition: all 0.3s ease-in-out;
+}
+.carousel-indicators button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #000;
+}
+</style>
 
 </body>

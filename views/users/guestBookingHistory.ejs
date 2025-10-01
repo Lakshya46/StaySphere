@@ -1,0 +1,66 @@
+<% layout("./layouts/boilerplate") %>
+
+<div class="container my-5">
+  <h3 class="mb-4"><i class="fas fa-history me-2"></i>All Bookings</h3>
+
+  <% if(bookings.length === 0){ %>
+    <div class="alert alert-info">No bookings found.</div>
+  <% } else { %>
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Property</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Total Price</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(b => { 
+               const today = new Date();
+               const isUpcoming = new Date(b.endDate) >= today;
+          %>
+            <tr class="booking-row" style="cursor: pointer;" 
+                onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'"
+                <%= isUpcoming ? 'class="table-primary"' : '' %>>
+              <td>
+                <div class="d-flex align-items-center gap-2 ps-2">
+                  <% if(b.listing.featuredImage){ %>
+                    <img src="<%= b.listing.featuredImage.url %>" 
+                         alt="property" class="rounded-2" 
+                         style="width: 60px; height: 45px; object-fit: cover;">
+                  <% } %>
+                  <span class="fw-semibold"><%= b.listing.title %></span>
+                </div>
+              </td>
+              <td><%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></td>
+              <td><%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></td>
+              <td class="fw-bold text-success">₹<%= b.totalPrice.toLocaleString("en-IN") %></td>
+              <td class="<%= b.status === 'confirmed' ? 'text-success fw-semibold' 
+                          : b.status === 'pending' ? 'text-warning fw-semibold' 
+                          : 'text-danger fw-semibold' %>">
+                <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<style>
+.booking-row:hover {
+  background-color: #f1f8ff;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+.table td, .table th {
+  vertical-align: middle;
+}
+.table-primary {
+  background-color: #e0f7ff !important;
+}
+</style>

@@ -1,54 +1,80 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top border-bottom">
   <div class="container-fluid">
+
     <!-- Brand -->
-    <a class="navbar-brand" >
-      <i class="fa-solid fa-compass"></i>
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/listings">
+      <i class="fa-solid fa-compass fs-4 text-primary"></i>
+      <span class="fs-4 " style="color: #0d6efd;">StaySphere</span>
     </a>
 
-    <!-- Toggle Button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+    <!-- Toggler for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navbar Content -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <!-- Left Side -->
-      <ul class="navbar-nav">
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav mb-2 mb-md-0 align-items-md-center gap-2">
         <li class="nav-item">
-          <a class="nav-link" href="/listings">Explore</a>
+          <a class="nav-link px-3 fw-medium" href="/listings">Explore</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/listings/new">New Listing</a>
+          <a class="nav-link px-3 fw-medium" href="/listings/new">New Listing</a>
         </li>
-      </ul>
-
-      <!-- Right Side -->
-      <ul class="navbar-nav ms-auto">
 
         <% if (!currentuser) { %>
           <li class="nav-item">
-            <a class="nav-link" href="/users/signup">Sign Up</a>
+            <a class="nav-link px-3 fw-medium" href="/users/signup">Sign Up</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/users/login">Login</a>
+            <a class="btn btn-primary rounded-pill px-4 py-2 fw-semibold" href="/users/login">Login</a>
           </li>
         <% } %>
 
         <% if (currentuser) { %>
           <li class="nav-item">
-  <a class="nav-link" href="/users/<%= currentuser._id %>/bookings">My Bookings</a>
-</li>
-
-
-          <li class="nav-item">
-            <a class="nav-link" href="/users/profile">My Profile</a>
+            <a class="nav-link px-3 fw-medium" href="/users/guest/bookings/upcoming">My Bookings</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/users/logout">Logout</a>
+            <a class="nav-link px-3 fw-medium" href="/users/profile">My Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-outline-danger rounded-pill px-4 py-2 fw-semibold" href="/users/logout">Logout</a>
           </li>
         <% } %>
       </ul>
     </div>
+
   </div>
 </nav>
+
+<style>
+  /* Modern hover effect */
+  .navbar .nav-link {
+    color: #555 !important;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .navbar .nav-link:hover {
+    color: #0d6efd !important;
+  }
+
+  /* Underline animation */
+  .navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    left: 0;
+    bottom: 0;
+    background-color: #0d6efd;
+    transition: width 0.3s;
+  }
+
+  .navbar .nav-link:hover::after {
+    width: 100%;
+  }
+</style>
+

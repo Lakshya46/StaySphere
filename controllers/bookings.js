@@ -8,29 +8,23 @@ module.exports.createBooking = async (req, res) => {
     const { id } = req.params;   // Listing ID
     const { checkIn, checkOut, guests } = req.body;
 
-    // Find listing
     const listing = await Listing.findById(id);
     if (!listing) {
         req.flash("error", "Listing not found!");
         return res.redirect("/listings");
     }
 
-    // Calculate nights
-    const nights = Math.ceil(
-        (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
-    );
+    const nights = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000*60*60*24));
     if (nights <= 0) {
         req.flash("error", "Invalid booking dates!");
         return res.redirect(`/listings/${id}`);
     }
 
-    // Validate guests
     if (!guests || guests <= 0) {
         req.flash("error", "Please select number of guests!");
         return res.redirect(`/listings/${id}`);
     }
 
-    // Conflict check
     const conflict = await Booking.findOne({
         listing: listing._id,
         status: "confirmed",
@@ -46,26 +40,24 @@ module.exports.createBooking = async (req, res) => {
         return res.redirect(`/listings/${id}`);
     }
 
-    // Calculate total price
     const totalPrice = listing.price * nights;
 
-    // Create booking
+    // Create booking with status "pending"
     const booking = new Booking({
         listing: listing._id,
         user: req.user._id,
         startDate: checkIn,
         endDate: checkOut,
         guests,
-        totalPrice
+        totalPrice,
+        status: "pending"
     });
 
     await booking.save();
 
-    req.flash("success", "Booking confirmed!");
+    req.flash("success", "Booking created! Please complete payment to confirm.");
     res.redirect(`/listings/${id}/booking/${booking._id}`);
 };
-
-
 // =======================
 // Show booking details
 // =======================
@@ -82,6 +74,36 @@ module.exports.showBooking = async (req, res) => {
     res.render("booking/show", { booking });
 };
 
+
+
+// Simulate payment success
+module.exports.payBooking = async (req, res) => {
+    const { id, bookingId } = req.params; // id = listingId
+
+    const booking = await Booking.findById(bookingId).populate("listing");
+    if (!booking) {
+        req.flash("error", "Booking not found!");
+        return res.redirect("/listings");
+    }
+
+    // Ensure logged-in user owns this booking
+    if (!booking.user.equals(req.user._id)) {
+        req.flash("error", "You are not authorized to pay for this booking!");
+        return res.redirect(`/listings/${id}/booking/${bookingId}`);
+    }
+
+    if (booking.status === "confirmed") {
+        req.flash("info", "Booking is already confirmed.");
+        return res.redirect(`/listings/${id}/booking/${bookingId}`);
+    }
+
+    // Simulate payment
+    booking.status = "confirmed";
+    await booking.save();
+
+    req.flash("success", "Payment successful! Booking confirmed.");
+    res.redirect(`/listings/${id}/booking/${bookingId}`);
+};
 
 // =======================
 // Cancel a booking

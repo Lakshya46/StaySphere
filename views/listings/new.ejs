@@ -1,62 +1,178 @@
 <% layout("./layouts/boilerplate") %>
 
-<body>
-    <br><br>
-    <h1>Create a New Listing</h1>
+<div class="container my-5">
+  <h1 class="mb-4 text-center fw-bold text-primary">Create a New Stay Listing</h1>
+  <p class="text-center text-muted mb-5">Fill in the details below to publish your property and attract tenants.</p>
 
-    <form method="post" class="needs-validation" novalidate action="/listings" enctype="multipart/form-data">
-        <div class="row">
-            <div class="col-8 offset-2">
+  <form method="POST" class="needs-validation" novalidate action="/listings" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-lg-10 offset-lg-1">
+        <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5">
 
-                <!-- Title -->
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input class="form-control" name="listing[title]" type="text" required />
-                    <div class="invalid-feedback">Please enter a valid title.</div>
-                </div>
+          <!-- Title -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Title *</label>
+            <input class="form-control form-control-lg" name="listing[title]" type="text" placeholder="Cozy 2BHK near Connaught Place" required>
+            <div class="invalid-feedback">Please enter a title for your listing.</div>
+          </div>
 
-                <!-- Description -->
-                <div class="mb-3">
-                    <label class="form-label" for="description">Description</label>
-                    <textarea class="form-control" name="listing[description]" required></textarea>
-                    <div class="invalid-feedback">Please provide a description.</div>
-                </div>
+          <!-- Description -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Description *</label>
+            <textarea class="form-control" name="listing[description]" rows="4" placeholder="Describe your property, nearby landmarks, vibe..." required></textarea>
+            <div class="invalid-feedback">Please provide a description.</div>
+          </div>
 
-                <!-- Image URL -->
-                <div class="mb-3">
-              
-                     <label class="form-label" for="image">Image File</label>
-                    <input class="form-control" name="listing[image]" type="file" required />
-                </div>
-
-
-                <div class="row">
-                    <!-- Price -->
-                    <div class="mb-3 col-md-8">
-                        <label class="form-label" for="price">Price</label>
-                        <input class="form-control" name="listing[price]"  required />
-                        <div class="invalid-feedback">Please enter a valid price (greater than 0).</div>
-                    </div>
-
-                    <!-- Country -->
-                    <div class="mb-3 col-md-4">
-                        <label class="form-label" for="country">Country</label>
-                        <input class="form-control" name="listing[country]" type="text" required />
-                        <div class="invalid-feedback">Please enter a country name.</div>
-                    </div>
-                </div>
-
-                <!-- Location -->
-                <div class="mb-3">
-                    <label class="form-label" for="location">Location</label>
-                    <input class="form-control" name="listing[location]" type="text" required />
-                    <div class="invalid-feedback">Please enter a location.</div>
-                </div>
-
-                <!-- Submit Button -->
-                <button class="btn btn-primary" type="submit">Submit</button>
-
+          <!-- Images -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Featured Image *</label>
+              <input class="form-control" name="listing[featuredImage]" type="file" accept="image/*" required>
+              <div class="invalid-feedback">Upload a featured image.</div>
             </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Additional Images</label>
+              <input class="form-control" name="listing[images]" type="file" accept="image/*" multiple>
+              <div class="form-text">Upload multiple images (Ctrl/Command + Click).</div>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Price (per month, ₹) *</label>
+            <div class="input-group">
+              <span class="input-group-text">₹</span>
+              <input class="form-control" name="listing[price]" type="number" min="1000" placeholder="15000" required>
+            </div>
+            <div class="invalid-feedback">Enter a valid price greater than ₹1000.</div>
+          </div>
+
+          <!-- Location -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Country *</label>
+              <input class="form-control" name="listing[country]" type="text" value="India" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">City *</label>
+              <input class="form-control" name="listing[city]" type="text" placeholder="Delhi, Mumbai..." required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Locality / Area *</label>
+              <input class="form-control" name="listing[area]" type="text" placeholder="Connaught Place, Bandra West..." required>
+            </div>
+          </div>
+
+          <!-- Property Type & BHK -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Property Type *</label>
+              <select class="form-select" name="listing[propertyType]" required>
+                <option value="">Select Property Type</option>
+                <option value="Apartment/Flat">Apartment / Flat</option>
+                <option value="House">Independent House / Villa</option>
+                <option value="PG">PG / Paying Guest</option>
+                <option value="Homestay">Homestay</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">BHK Type *</label>
+              <select class="form-select" name="listing[bhkType]" required>
+                <option value="">Select BHK Type</option>
+                <option value="1BHK">1BHK</option>
+                <option value="2BHK">2BHK</option>
+                <option value="3BHK">3BHK</option>
+                <option value="4BHK+">4BHK or more</option>
+                <option value="Studio">Studio</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bedrooms & Bathrooms -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Bedrooms *</label>
+              <input class="form-control" type="number" name="listing[bedrooms]" min="1" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Bathrooms *</label>
+              <input class="form-control" type="number" name="listing[bathrooms]" min="1" required>
+            </div>
+          </div>
+
+          <!-- Amenities -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Amenities</label>
+            <div class="d-flex flex-wrap gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="WiFi">
+                <label class="form-check-label">WiFi</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="AC">
+                <label class="form-check-label">AC</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="listing[amenities][]" value="Parking">
+                <label class="form-check-label">Parking</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">House Rules / Additional Info</label>
+            <textarea class="form-control" name="listing[additionalInfo]" rows="3" placeholder="No pets, No smoking, Family-friendly"></textarea>
+          </div>
+
+          <!-- Maps -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Google Maps Link</label>
+            <input class="form-control" type="url" name="listing[mapLink]" placeholder="https://maps.google.com/...">
+          </div>
+
+          <!-- Submit -->
+          <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" type="submit">
+              <i class="fa-solid fa-paper-plane me-2"></i> Submit Listing
+            </button>
+          </div>
+
         </div>
-    </form>
-</body>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .card {
+    background: #fff;
+    border-radius: 1rem;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+  }
+
+  .form-label {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #156ef3, #2f85ff);
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(21,110,243,0.4);
+  }
+</style>

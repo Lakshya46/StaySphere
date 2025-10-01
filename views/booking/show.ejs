@@ -1,91 +1,118 @@
 <% layout("./layouts/boilerplate") %>
 
 <div class="container my-5">
-  <div class="card shadow border-0 rounded-4 overflow-hidden">
-    
+  <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
     <!-- Header -->
-    <div class="card-header bg-gradient bg-primary text-white py-3">
+    <div class="card-header text-white py-3" style="background: linear-gradient(90deg, #008cff, #00d4ff);">
       <h3 class="mb-0 fw-bold">
-        <i class="fas fa-receipt me-2"></i> Booking Details
+        <i class="fas fa-receipt me-2"></i> Booking Summary
       </h3>
     </div>
 
     <div class="card-body p-4">
-      
+
       <!-- Listing Info -->
-      <div class="mb-4">
-        <h4 class="fw-bold mb-1"><%= booking.listing.title %></h4>
-        <p class="text-muted mb-2">
-          <i class="fas fa-map-marker-alt me-1 text-danger"></i>
-          <%= booking.listing.location %>, <%= booking.listing.country %>
-        </p>
-        <% if (booking.listing.image && booking.listing.image.url) { %>
-          <div class="text-center">
-            <img src="<%= booking.listing.image.url %>" 
-                 alt="<%= booking.listing.title %>" 
-                 class="img-fluid rounded shadow-sm mb-3"
-                 style="max-height: 300px; object-fit: cover;">
-          </div>
+      <div class="mb-4 text-center">
+        <% if (booking.listing.featuredImage && booking.listing.featuredImage.url) { %>
+          <img src="<%= booking.listing.featuredImage.url %>" 
+               alt="<%= booking.listing.title %>" 
+               class="img-fluid rounded shadow-sm mb-3"
+               style="max-height: 300px; object-fit: cover;">
         <% } %>
+        <h4 class="fw-bold text-primary"><%= booking.listing.title %></h4>
+        <p class="text-muted">
+          <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+          <%= booking.listing.area %>, <%= booking.listing.city %>, <%= booking.listing.country %>
+        </p>
       </div>
 
-      <!-- Booking Info -->
+      <!-- Booking Details -->
       <div class="row g-3 mb-4">
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Guest Name:</strong> <%= booking.user.username %>
+        <% const details = [
+          { icon: 'fa-user', label: 'Guest Name', value: booking.user.username },
+          { icon: 'fa-users', label: 'Guests', value: booking.guests },
+          { icon: 'fa-calendar-check', label: 'Check-In', value: booking.startDate.toDateString() },
+          { icon: 'fa-calendar-times', label: 'Check-Out', value: booking.endDate.toDateString() },
+          { icon: 'fa-money-bill-wave', label: 'Total Price', value: `₹${booking.totalPrice.toLocaleString()}`, color: 'text-success fw-bold' },
+          { icon: 'fa-info-circle', label: 'Status', value: booking.status.charAt(0).toUpperCase() + booking.status.slice(1),
+            color: booking.status === 'confirmed' ? 'text-success fw-semibold'
+                  : booking.status === 'pending' ? 'text-warning fw-semibold'
+                  : 'text-danger fw-semibold' }
+        ]; %>
+
+        <% details.forEach(d => { %>
+          <div class="col-md-4">
+            <div class="border rounded-3 p-3 bg-light text-center shadow-sm h-100">
+              <i class="fas <%= d.icon %> fw-bold me-1"></i>
+              <div class="fw-semibold mb-1"><%= d.label %></div>
+              <div class="<%= d.color || '' %>"><%= d.value %></div>
+            </div>
           </div>
-        </div>
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Guests:</strong> <%= booking.guests %>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Check-In:</strong> <%= booking.startDate.toDateString() %>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Check-Out:</strong> <%= booking.endDate.toDateString() %>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Total Price:</strong> 
-            <span class="fw-bold text-success">$<%= booking.totalPrice %></span>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="border rounded-3 p-3 bg-light">
-            <strong>Status:</strong> 
-            <span class="badge fs-6 px-3 py-2 
-              <%= booking.status === 'confirmed' ? 'bg-success' 
-              : booking.status === 'pending' ? 'bg-warning text-dark' 
-              : 'bg-danger' %>">
-              <%= booking.status %>
-            </span>
-          </div>
-        </div>
+        <% }) %>
       </div>
 
       <!-- Actions -->
-      <div class="d-flex justify-content-between">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 gap-3">
+
         <a href="/listings/<%= booking.listing._id %>" 
-           class="btn btn-outline-primary px-4 rounded-pill">
-          <i class="fas fa-arrow-left me-2"></i> Back to Listing
+           class="btn btn-outline-primary px-4 rounded-pill shadow-sm">
+          <i class="fas fa-arrow-left me-2"></i> Back
         </a>
+
+        <% if (booking.status === "pending") { %>
+          <form method="POST" action="/listings/<%= booking.listing._id %>/booking/<%= booking._id %>/pay">
+            <button class="btn btn-success px-4 rounded-pill shadow-sm">
+              <i class="fas fa-credit-card me-2"></i> Pay Now
+            </button>
+          </form>
+        <% } else if (booking.status === "confirmed") { %>
+          <button class="btn btn-success px-4 rounded-pill shadow-sm" disabled>
+            <i class="fas fa-check-circle me-2"></i> Paid & Confirmed
+          </button>
+        <% } %>
 
         <% if (booking.status !== "cancelled") { %>
           <form method="POST" action="/listings/<%= booking.listing._id %>/booking/<%= booking._id %>?_method=DELETE">
-            <button type="submit" class="btn btn-danger px-4 rounded-pill">
+            <button type="submit" class="btn btn-danger px-4 rounded-pill shadow-sm">
               <i class="fas fa-times-circle me-2"></i> Cancel Booking
             </button>
           </form>
         <% } %>
+
       </div>
 
     </div>
   </div>
 </div>
+
+<style>
+.card-body img {
+  transition: transform 0.2s ease;
+}
+.card-body img:hover {
+  transform: scale(1.03);
+}
+
+.btn-outline-primary:hover {
+  color: #fff;
+  background: #008cff;
+  border-color: #008cff;
+}
+
+.shadow-sm {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
+}
+
+.border {
+  border: 1px solid #e3e3e3 !important;
+}
+
+h4.text-primary {
+  font-size: 1.6rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+</style>

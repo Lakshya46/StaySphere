@@ -1,6 +1,7 @@
 const Booking = require("../models/booking");
 const Listing = require("../models/listing");
 
+const razorpay = require("../utils/razorpay");
 // =======================
 // Create a booking
 // =======================
@@ -63,7 +64,10 @@ module.exports.createBooking = async (req, res) => {
 // =======================
 module.exports.showBooking = async (req, res) => {
     const booking = await Booking.findById(req.params.bookingId)
-        .populate("listing")
+        .populate({
+            path: "listing",
+            populate: { path: "owner" }  // <-- populate owner inside listing
+        })
         .populate("user");
 
     if (!booking) {
@@ -71,10 +75,48 @@ module.exports.showBooking = async (req, res) => {
         return res.redirect("/listings");
     }
 
-    res.render("booking/show", { booking });
+    res.render("booking/show", { booking  , currentUser: req.user });
 };
 
 
+
+
+// Generate payment order
+module.exports.createRazorpayOrder = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const booking = await Booking.findById(bookingId).populate("listing");
+    if (!booking) return res.status(404).send("Booking not found");
+
+    // MOCK order (no Razorpay account needed)
+    const order = {
+      id: "order_test_123", // mock order ID
+      amount: booking.totalPrice * 100,
+      currency: "INR",
+      receipt: `booking_${booking._id}`,
+    };
+
+    res.json({ order, booking });
+  } catch (err) {
+    console.error("Error creating Razorpay order:", err);
+    res.status(500).json({ error: "Failed to create payment order", details: err.message });
+  }
+};
+
+// =======================
+// Verify payment (mock)
+// =======================
+module.exports.verifyPayment = async (req, res) => {
+  const { bookingId } = req.params;
+  const booking = await Booking.findById(bookingId);
+  if (!booking) return res.status(404).send("Booking not found");
+
+  // MARK AS CONFIRMED
+  booking.status = "confirmed";
+  await booking.save();
+
+  res.json({ success: true, message: "Booking confirmed!" });
+};
 
 // Simulate payment success
 module.exports.payBooking = async (req, res) => {

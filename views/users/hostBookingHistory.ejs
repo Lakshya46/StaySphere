@@ -1,34 +1,164 @@
 <% layout("./layouts/boilerplate") %>
 
-<div class="container mt-5">
-  <h3 class="mb-4"><i class="fas fa-history me-2"></i>Past Guest Bookings</h3>
+<div class="container my-5">
+  <h3 class="mb-4 text-primary fw-bold text-center">
+    <i class="fas fa-history me-2"></i>Past Guest Bookings
+  </h3>
 
-  <% if(bookings.length === 0){ %>
-    <p>No past bookings.</p>
+  <% if (bookings.length === 0) { %>
+    <div class="alert alert-info rounded-4 shadow-sm text-center py-3">
+      No past bookings found.
+    </div>
   <% } else { %>
-    <table class="table table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>Guest</th>
-          <th>Property</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Total Price</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% bookings.forEach(b => { %>
-          <tr>
-            <td><%= b.user.username %></td>
-            <td><%= b.listing.title %></td>
-            <td><%= new Date(b.startDate).toLocaleDateString() %></td>
-            <td><%= new Date(b.endDate).toLocaleDateString() %></td>
-            <td>₹<%= b.totalPrice.toLocaleString("en-IN") %></td>
-            <td><%= b.status %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+
+    <!-- 🖥️ Desktop View -->
+    <div class="d-none d-md-block">
+      <% bookings.forEach(b => { %>
+        <div class="d-flex shadow-sm rounded-4 overflow-hidden mb-3 p-3 align-items-center card-row"
+             onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'"
+             style="cursor:pointer;">
+          
+          <!-- 👤 Guest -->
+          <div class="col-md-2 d-flex align-items-center gap-2">
+            <img 
+              src="<%= b.user.avatar || 'https://i.ibb.co/2FxW9Nz/default-avatar.png' %>" 
+              alt="Guest" 
+              class="rounded-circle border" 
+              style="width:50px; height:50px; object-fit:cover;">
+            <span class="fw-semibold text-dark"><%= b.user.username %></span>
+          </div>
+
+          <!-- 🏠 Property -->
+          <div class="col-md-3 d-flex align-items-center gap-3">
+            <% if (b.listing.featuredImage) { %>
+              <img 
+                src="<%= b.listing.featuredImage.url %>" 
+                alt="property" 
+                class="rounded-2" 
+                style="width:80px; height:55px; object-fit:cover;">
+            <% } else { %>
+              <div class="bg-light rounded-2 d-flex align-items-center justify-content-center" 
+                   style="width:80px; height:55px;">
+                <i class="fas fa-home text-secondary"></i>
+              </div>
+            <% } %>
+            <span class="fw-semibold text-dark"><%= b.listing.title %></span>
+          </div>
+
+          <!-- 📅 Start -->
+          <div class="col-md-2 d-flex align-items-center text-secondary">
+            <i class="fas fa-calendar-check me-1 text-primary"></i>
+            <%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+          </div>
+
+          <!-- 📆 End -->
+          <div class="col-md-2 d-flex align-items-center text-secondary">
+            <i class="fas fa-calendar-times me-1 text-danger"></i>
+            <%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+          </div>
+
+          <!-- 💰 Price -->
+          <div class="col-md-2 fw-bold text-success d-flex align-items-center">
+            ₹<%= b.totalPrice.toLocaleString("en-IN") %>
+          </div>
+
+          <!-- 🟢 Status -->
+          <div class="col-md-1 fw-semibold d-flex align-items-center 
+                      <%= b.status === 'confirmed' ? 'text-success' 
+                          : b.status === 'pending' ? 'text-warning' 
+                          : 'text-danger' %>">
+            <i class="fas fa-info-circle me-1"></i>
+            <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- 📱 Mobile View -->
+    <div class="d-block d-md-none">
+      <% bookings.forEach(b => { %>
+        <div class="card mb-3 shadow-sm rounded-4 p-3" 
+             onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'"
+             style="cursor:pointer;">
+          <div class="d-flex flex-column align-items-center gap-2">
+            
+            <!-- Property Image -->
+            <% if (b.listing.featuredImage) { %>
+              <img 
+                src="<%= b.listing.featuredImage.url %>" 
+                alt="property" 
+                class="rounded-3 mb-2" 
+                style="width:100%; height:180px; object-fit:cover;">
+            <% } else { %>
+              <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mb-2" 
+                   style="width:100%; height:180px;">
+                <i class="fas fa-home text-secondary fs-3"></i>
+              </div>
+            <% } %>
+
+            <!-- Guest -->
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+              <img 
+                src="<%= b.user.avatar || 'https://i.ibb.co/2FxW9Nz/default-avatar.png' %>" 
+                alt="Guest" 
+                class="rounded-circle border" 
+                style="width:45px; height:45px; object-fit:cover;">
+              <h6 class="fw-semibold text-dark mb-0"><%= b.user.username %></h6>
+            </div>
+
+            <!-- Details -->
+            <h5 class="fw-semibold text-primary text-center mb-1"><%= b.listing.title %></h5>
+            <p class="text-secondary small mb-1">
+              <i class="fas fa-calendar-check text-primary me-1"></i>
+              Start: <%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+            </p>
+            <p class="text-secondary small mb-1">
+              <i class="fas fa-calendar-times text-danger me-1"></i>
+              End: <%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center w-100 mt-2">
+              <div class="fw-bold text-success">
+                ₹<%= b.totalPrice.toLocaleString("en-IN") %>
+              </div>
+              <div class="<%= b.status === 'confirmed' ? 'text-success' 
+                              : b.status === 'pending' ? 'text-warning' 
+                              : 'text-danger' %> fw-semibold text-capitalize">
+                <i class="fas fa-info-circle me-1"></i><%= b.status %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
   <% } %>
 </div>
+
+<style>
+.card-row {
+  transition: all 0.25s ease;
+  background-color: #fff;
+  border-radius: 12px;
+}
+.card-row:hover {
+  background: #f0f8ff;
+  transform: scale(1.01);
+}
+.card:hover {
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+.table td, .table th {
+  vertical-align: middle;
+}
+@media (max-width: 767px) {
+  .card {
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .card img {
+    border-radius: 10px;
+  }
+}
+</style>

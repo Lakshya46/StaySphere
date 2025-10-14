@@ -1,21 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const multer = require("multer");
+
 const wrapAsync = require("../utils/wrapAsync");
 const middleware = require("../middleware");
 const userController = require("../controllers/users");
-const User = require("../models/user");
-const Listing = require("../models/listing");
-const Booking = require("../models/booking");
-const multer = require("multer");
 const { storage } = require("../cloudConfig"); // Cloudinary storage
 const upload = multer({ storage });
 
-// ---------------- AUTH ----------------
+// =======================
+// AUTH ROUTES
+// =======================
+
+// Sign Up
 router.route("/signup")
   .get(userController.renderSignUp)
   .post(wrapAsync(userController.userSignup));
 
+// Login
 router.route("/login")
   .get(userController.renderLogin)
   .post(
@@ -23,11 +26,20 @@ router.route("/login")
     userController.userLogin
   );
 
+// Logout
 router.get("/logout", userController.userLogout);
 
-// ---------------- PROFILE ----------------
+// =======================
+// PROFILE ROUTES
+// =======================
+
+// User Profile
 router.get("/profile", middleware.isLogged, wrapAsync(userController.renderProfile));
-router.get("/profile/edit", middleware.isLogged, wrapAsync(userController.renderEditProfile));
+
+// Edit Profile (render page)
+router.get("/profile/edit", middleware.isLogged, userController.renderEditProfile);
+
+// Update Profile (submit form)
 router.post(
   "/profile/edit",
   middleware.isLogged,
@@ -35,41 +47,27 @@ router.post(
   wrapAsync(userController.updateProfile)
 );
 
-// ---------------- GUEST ACTIONS ----------------
+// =======================
+// GUEST ACTIONS
+// =======================
 
 // Wishlist
-router.get("/guest/wishlist", middleware.isLogged, async (req, res) => {
-  const user = await User.findById(req.user._id).populate("wishlist");
-  res.render("users/wishlist", { user, wishlist: user.wishlist });
-});
+router.get("/guest/wishlist", middleware.isLogged, wrapAsync(userController.renderWishlist));
 
-// Toggle favorite
-router.post("/guest/favorites/:listingId/toggle", middleware.isLogged, userController.toggleFavorite);
+// Toggle Favorite
+router.post("/guest/favorites/:listingId/toggle", middleware.isLogged, wrapAsync(userController.toggleFavorite));
 
 // Upcoming Stays
-router.get("/guest/bookings/upcoming", middleware.isLogged, wrapAsync(async (req, res) => {
-  const bookings = await Booking.find({ 
-    user: req.user._id,
-    endDate: { $gte: new Date() }
-  }).populate("listing");
-  res.render("users/guestUpcomingBookings", { bookings });
-}));
+router.get("/guest/bookings/upcoming", middleware.isLogged, wrapAsync(userController.renderGuestUpcomingBookings));
 
-// Booking History (confirmed & canceled)
-router.get("/guest/bookings/history", middleware.isLogged, wrapAsync(async (req, res) => {
-  const bookings = await Booking.find({ 
-    user: req.user._id
-  }).populate("listing")
-    .sort({ startDate: -1 }); // optional: newest first
+// Booking History
+router.get("/guest/bookings/history", middleware.isLogged, wrapAsync(userController.renderGuestBookingHistory));
 
-  res.render("users/guestBookingHistory", { bookings });
-}));
+// =======================
+// HOST ACTIONS
+// =======================
 
-
-
-// ---------------- HOST ACTIONS ----------------
-
-// Middleware to check if user is a host
+// Middleware to check if user has host listings
 const isHost = async (req, res, next) => {
   const hostListings = await Listing.find({ owner: req.user._id });
   if (!hostListings.length) {
@@ -81,27 +79,12 @@ const isHost = async (req, res, next) => {
 };
 
 // All Listed Properties
-router.get("/host/properties", middleware.isLogged, wrapAsync(isHost), async (req, res) => {
-  const listings = req.hostListings;
-  res.render("users/hostProperties", { listings });
-});
+router.get("/host/properties", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostProperties));
 
 // Upcoming Guests
-router.get("/host/bookings/upcoming", middleware.isLogged, wrapAsync(isHost), wrapAsync(async (req, res) => {
-  const bookings = await Booking.find({ 
-    listing: { $in: req.hostListings.map(l => l._id) },
-    endDate: { $gte: new Date() }
-  }).populate("user listing");
-  res.render("users/hostUpcomingBookings", { bookings });
-}));
+router.get("/host/bookings/upcoming", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostUpcomingBookings));
 
-// Past Guests (Confirmed & Canceled)
-router.get("/host/bookings/history", middleware.isLogged, wrapAsync(isHost), wrapAsync(async (req, res) => {
-  const bookings = await Booking.find({ 
-    listing: { $in: req.hostListings.map(l => l._id) },
-    endDate: { $lt: new Date() }
-  }).populate("user listing");
-  res.render("users/hostBookingHistory", { bookings });
-}));
+// Past Guests
+router.get("/host/bookings/history", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostBookingHistory));
 
 module.exports = router;

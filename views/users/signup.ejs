@@ -1,76 +1,95 @@
 <% layout("./layouts/boilerplate.ejs") %>
 
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-lg p-4 rounded-4">
-        <h3 class="text-center mb-4 fw-bold text-primary">Sign Up for StaySphere</h3>
+<div class="row justify-content-center my-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg rounded-4 border-0 p-5 animate__animated animate__fadeIn">
+      <!-- Heading -->
+      <h3 class="text-center mb-3 fw-bold text-primary">Sign Up for StaySphere</h3>
+      <p class="text-center text-muted mb-4 small">Create your account and find the best stays near you</p>
 
-        <form action="/users/signup" method="post" class="needs-validation" novalidate>
-          
-          <!-- Username -->
-          <div class="mb-3">
-            <label for="username" class="form-label fw-semibold">Username *</label>
-            <input class="form-control form-control-lg" id="username" name="username" type="text" placeholder="Choose a username" required />
-            <div class="invalid-feedback">Please enter a valid username.</div>
-          </div>
+      <!-- Form -->
+      <form action="/users/signup" method="post" class="needs-validation" novalidate>
+        
+        <!-- Username -->
+        <div class="mb-3">
+          <label for="username" class="form-label fw-semibold">Username *</label>
+          <input class="form-control form-control-lg" id="username" name="username" type="text" placeholder="Choose a username" required />
+          <div class="invalid-feedback">Please enter a valid username.</div>
+        </div>
 
-          <!-- Email -->
-          <div class="mb-3">
-            <label for="email" class="form-label fw-semibold">Email *</label>
-            <input class="form-control form-control-lg" id="email" name="email" type="email" placeholder="you@example.com" required />
-            <div class="invalid-feedback">Please enter a valid email.</div>
-          </div>
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email *</label>
+          <input class="form-control form-control-lg" id="email" name="email" type="email" placeholder="you@example.com" required />
+          <div class="invalid-feedback">Please enter a valid email.</div>
+        </div>
 
-          <!-- Password -->
-          <div class="mb-3">
-            <label for="password" class="form-label fw-semibold">Password *</label>
-            <input class="form-control form-control-lg" id="password" name="password" type="password" placeholder="Enter a secure password" required />
-            <div class="invalid-feedback">Please enter a valid password.</div>
-          </div>
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold">Password *</label>
+          <input class="form-control form-control-lg" id="password" name="password" type="password" placeholder="Enter a secure password" required />
+          <div class="invalid-feedback">Please enter a valid password.</div>
+        </div>
 
-          <!-- Full Name (Optional) -->
-          <div class="mb-3">
-            <label for="name" class="form-label fw-semibold">Full Name</label>
-            <input class="form-control form-control-lg" id="name" name="name" type="text" placeholder="John Doe" />
-          </div>
+        <!-- Full Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold">Full Name</label>
+          <input class="form-control form-control-lg" id="name" name="name" type="text" placeholder="John Doe" />
+        </div>
 
-          <!-- Phone Number (Optional) -->
-          <div class="mb-3">
-            <label for="phone" class="form-label fw-semibold">Phone Number</label>
-            <input class="form-control form-control-lg" id="phone" name="phone" type="text" placeholder="+91 9876543210" />
-          </div>
+        <!-- Phone Number -->
+        <div class="mb-4">
+          <label for="phone" class="form-label fw-semibold">Phone Number</label>
+          <input class="form-control form-control-lg" id="phone" name="phone" type="text" placeholder="+91 9876543210" />
+        </div>
 
-          <!-- Submit -->
-          <button class="btn btn-primary btn-lg w-100 fw-semibold">Sign Up</button>
+        <!-- Submit -->
+        <button class="btn btn-gradient btn-lg w-100 fw-semibold mb-3">
+          Sign Up
+        </button>
 
-          <p class="text-center mt-3 small text-muted">
-            Already have an account? <a href="/users/login" class="text-decoration-none text-primary">Login here</a>
-          </p>
-        </form>
-      </div>
+        <p class="text-center mt-2 small text-muted">
+          Already have an account? <a href="/users/login" class="text-decoration-none text-primary fw-semibold">Login here</a>
+        </p>
+      </form>
     </div>
   </div>
 </div>
 
+<!-- Styles -->
 <style>
-  body {
-    background: #f5f7fa;
-  }
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
   .card {
     border: none;
+    padding: 2.5rem 2rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   }
+
   .form-label {
-    color: #333;
+    color: #495057;
   }
-  .btn-primary {
+
+  .btn-gradient {
+    background: linear-gradient(135deg, #156ef3, #2f85ff);
+    color: #fff;
+    border: none;
     border-radius: 50px;
-    padding: 0.6rem 1.5rem;
-    font-weight: 500;
+    padding: 0.65rem 1.5rem;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 110, 243, 0.4);
+  }
+
+  input.form-control-lg {
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
   }
 </style>

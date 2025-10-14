@@ -4,7 +4,7 @@
     <!-- Brand -->
     <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/listings">
       <i class="fa-solid fa-compass fs-4 text-primary"></i>
-      <span class="fs-4 " style="color: #0d6efd;">StaySphere</span>
+      <span class="fs-4" style="color: #0d6efd;">StaySphere</span>
     </a>
 
     <!-- Toggler for mobile -->
@@ -15,7 +15,7 @@
 
     <!-- Navbar links -->
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav mb-2 mb-md-0 align-items-md-center gap-2">
+      <ul class="navbar-nav mb-2 mb-md-0 align-items-md-center gap-2 flex-wrap">
         <li class="nav-item">
           <a class="nav-link px-3 fw-medium" href="/listings">Explore</a>
         </li>
@@ -28,7 +28,7 @@
             <a class="nav-link px-3 fw-medium" href="/users/signup">Sign Up</a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-primary rounded-pill px-4 py-2 fw-semibold" href="/users/login">Login</a>
+            <a class="nav-link px-3 fw-medium" href="/users/login">Login</a>
           </li>
         <% } %>
 
@@ -40,7 +40,7 @@
             <a class="nav-link px-3 fw-medium" href="/users/profile">My Profile</a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-outline-danger rounded-pill px-4 py-2 fw-semibold" href="/users/logout">Logout</a>
+            <a class="nav-link px-3 fw-medium text-danger fw-semibold" href="/users/logout">Logout</a>
           </li>
         <% } %>
       </ul>
@@ -50,18 +50,19 @@
 </nav>
 
 <style>
-  /* Modern hover effect */
+  /* Navbar links */
   .navbar .nav-link {
     color: #555 !important;
     position: relative;
     transition: color 0.3s ease;
+    white-space: nowrap;
   }
 
   .navbar .nav-link:hover {
     color: #0d6efd !important;
   }
 
-  /* Underline animation */
+  /* Underline animation for links */
   .navbar .nav-link::after {
     content: "";
     position: absolute;
@@ -76,5 +77,29 @@
   .navbar .nav-link:hover::after {
     width: 100%;
   }
-</style>
 
+  /* Logout as red hover button effect */
+  .navbar .nav-link.text-danger:hover {
+    color: #fff !important;
+    background-color: #dc3545;
+    border-radius: 50px;
+    padding: 0.25rem 1rem;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 767px) {
+    .navbar-nav {
+      gap: 0.5rem;
+    }
+
+    .navbar-nav .nav-link {
+      padding: 0.5rem 1rem;
+    }
+
+    .navbar-collapse {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 0 0 10px 10px;
+    }
+  }
+</style>

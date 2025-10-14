@@ -1,66 +1,127 @@
 <% layout("./layouts/boilerplate") %>
 
 <div class="container my-5">
-  <h3 class="mb-4"><i class="fas fa-history me-2"></i>All Bookings</h3>
+  <h3 class="mb-4 text-primary fw-bold text-center">
+    <i class="fas fa-history me-2"></i>All Bookings
+  </h3>
 
   <% if(bookings.length === 0){ %>
-    <div class="alert alert-info">No bookings found.</div>
-  <% } else { %>
-    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
-      <table class="table table-hover align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Property</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Total Price</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% bookings.forEach(b => { 
-               const today = new Date();
-               const isUpcoming = new Date(b.endDate) >= today;
-          %>
-            <tr class="booking-row" style="cursor: pointer;" 
-                onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'"
-                <%= isUpcoming ? 'class="table-primary"' : '' %>>
-              <td>
-                <div class="d-flex align-items-center gap-2 ps-2">
-                  <% if(b.listing.featuredImage){ %>
-                    <img src="<%= b.listing.featuredImage.url %>" 
-                         alt="property" class="rounded-2" 
-                         style="width: 60px; height: 45px; object-fit: cover;">
-                  <% } %>
-                  <span class="fw-semibold"><%= b.listing.title %></span>
-                </div>
-              </td>
-              <td><%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></td>
-              <td><%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></td>
-              <td class="fw-bold text-success">₹<%= b.totalPrice.toLocaleString("en-IN") %></td>
-              <td class="<%= b.status === 'confirmed' ? 'text-success fw-semibold' 
-                          : b.status === 'pending' ? 'text-warning fw-semibold' 
-                          : 'text-danger fw-semibold' %>">
-                <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
+    <div class="alert alert-info rounded-4 shadow-sm text-center py-3">
+      No bookings found.
     </div>
+  <% } else { %>
+
+    <!-- Table-like Card Header for Desktop -->
+    <div class="d-none d-md-flex shadow-sm rounded-4 overflow-hidden mb-2 p-2  bg-primary text-white fw-semibold">
+      <div class="col-md-4 text-center">Property</div>
+      <div class="col-md-2 text-center">Start Date</div>
+      <div class="col-md-2  text-center">End Date</div>
+      <div class="col-md-2  text-center">Total Price</div>
+      <div class="col-md-2  text-center">Status</div>
+    </div>
+
+    <!-- Desktop Cards -->
+   <!-- Desktop Cards -->
+<div class="d-none d-md-block">
+  <% bookings.forEach(b => { %>
+    <div class="d-flex shadow-sm rounded-4 overflow-hidden mb-2 p-2 align-items-center card-row" 
+         onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'" 
+         style="cursor:pointer;">
+
+      <!-- Property (centered) -->
+      <div class="col-md-4 d-flex align-items-center justify-content-center gap-2">
+        <div class="flex-column col-md-6" style='padding-left: 100px;';">
+<% if(b.listing.featuredImage){ %>
+          <img src="<%= b.listing.featuredImage.url %>" 
+               alt="property" class="rounded-2" 
+               style="width: 80px; height: 60px; object-fit: cover;">
+        <% } %>
+        </div>
+        <div class="flex-column col-md-6">
+        <span class="fw-semibold "><%= b.listing.title %></span>
+
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="col-md-2 d-flex justify-content-center align-items-center">
+        <i class="fas fa-calendar-check me-1 text-primary"></i>
+        <%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+      </div>
+
+      <!-- End Date -->
+      <div class="col-md-2 d-flex justify-content-center align-items-center">
+        <i class="fas fa-calendar-times me-1 text-danger"></i>
+        <%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+      </div>
+
+      <!-- Total Price -->
+      <div class="col-md-2 d-flex justify-content-center align-items-center fw-bold text-success">
+        ₹<%= b.totalPrice.toLocaleString("en-IN") %>
+      </div>
+
+      <!-- Status -->
+      <div class="col-md-2 d-flex justify-content-center align-items-center fw-semibold <%= b.status === 'confirmed' ? 'text-success' 
+                                                    : b.status === 'pending' ? 'text-warning' 
+                                                    : 'text-danger' %>">            <i class="fas fa-info-circle me-1"></i>
+
+        <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+      </div>
+
+    </div>
+  <% }) %>
+</div>
+
+
+    <!-- Mobile Cards -->
+    <div class="d-block d-md-none">
+      <% bookings.forEach(b => { %>
+        <div class="card mb-3 shadow-sm rounded-4 p-3" 
+             onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'" 
+             style="cursor:pointer;">
+          <div class="d-flex align-items-center gap-3">
+            <% if(b.listing.featuredImage){ %>
+              <img src="<%= b.listing.featuredImage.url %>" 
+                   alt="property" class="rounded-2" 
+                   style="width: 120px; height: 120px; object-fit: cover;">
+            <% } %>
+            <div class="flex-grow-1">
+              <h5 class="fw-semibold mb-2"><%= b.listing.title %></h5>
+              <p class="mb-1 text-secondary">
+                <i class="fas fa-calendar-check me-1 text-primary"></i>
+                <strong>Start:</strong> <%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+              </p>
+              <p class="mb-2 text-secondary">
+                <i class="fas fa-calendar-times me-1 text-danger"></i>
+                <strong>End:</strong> <%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+              </p>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="fw-bold text-success">₹<%= b.totalPrice.toLocaleString("en-IN") %></span>
+                <span class="<%= b.status === 'confirmed' ? 'text-success fw-semibold' 
+                              : b.status === 'pending' ? 'text-warning fw-semibold' 
+                              : 'text-danger fw-semibold' %>">
+                  <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
   <% } %>
 </div>
 
 <style>
-.booking-row:hover {
-  background-color: #f1f8ff;
+.card-row {
+  transition: all 0.25s ease;
+}
+.card-row:hover {
+  background: #f0f8ff;
   transform: scale(1.01);
+}
+.card:hover {
+  transform: scale(1.02);
   transition: all 0.2s ease;
-}
-.table td, .table th {
-  vertical-align: middle;
-}
-.table-primary {
-  background-color: #e0f7ff !important;
 }
 </style>

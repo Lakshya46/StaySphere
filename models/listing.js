@@ -10,7 +10,13 @@ const listingSchema = new Schema(
 
     // Featured image
     featuredImage: {
-      url: { type: String, required: true },
+      url: {
+        type: String,
+        required: function () {
+          // required only if this is a new document
+          return this.isNew;
+        },
+      },
       filename: String,
     },
 
@@ -23,7 +29,7 @@ const listingSchema = new Schema(
     ],
 
     // Pricing
-    price: { type: Number, required: true }, // matches form
+    price: { type: Number, required: true }, // per day
     deposit: { type: Number, default: 0 },
     stayType: {
       type: String,
@@ -34,20 +40,35 @@ const listingSchema = new Schema(
     // Property type / BHK type
     propertyType: {
       type: String,
-      enum: ["Apartment/Flat", "House", "PG", "Homestay"],
+      enum: ["Flat", "PG", "Studio"],
       required: true,
     },
     bhkType: {
       type: String,
-      enum: ["1BHK", "2BHK", "3BHK", "4BHK+", "Studio"],
-      required: true,
+      enum: ["1BHK", "2BHK", "3BHK", "4BHK+", "Studio", "More"],
+      required: function () {
+        return this.propertyType === "Flat";
+      },
     },
 
     // Bedrooms & Bathrooms
-    bedrooms: { type: Number, required: true },
-    bathrooms: { type: Number, required: true },
+  // Bedrooms & Bathrooms
+bedrooms: {
+  type: Number,
+  required: function () {
+    return this.propertyType === "Flat"; // Only required for Flats
+  },
+  min: 1,
+},
+bathrooms: {
+  type: Number,
+  required: function () {
+    return this.propertyType === "Flat"; // Only required for Flats
+  },
+  min: 1,
+},
 
-    // Amenities (optional, multiple)
+    // Amenities
     amenities: [
       {
         type: String,
@@ -59,11 +80,18 @@ const listingSchema = new Schema(
     country: { type: String, required: true },
     city: { type: String, required: true },
     area: { type: String, required: true },
-    nearBy: String, // e.g., "Near RGPV Bhopal" or "Metro Station 500m"
+    pincode: { type: String, required: true },
+    nearby: { type: Boolean, default: false },
 
     // Additional info
     additionalInfo: String,
     mapLink: String,
+    latitude: { type: Number, required: true },
+    longitude: { type: Number, required: true },
+
+    // Availability Dates
+    availableFrom: { type: Date },
+    availableTo: { type: Date },
 
     // Ownership & Engagement
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },

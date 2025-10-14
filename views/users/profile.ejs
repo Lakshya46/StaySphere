@@ -1,108 +1,97 @@
 <% layout("./layouts/boilerplate") %>
 
 <style>
-  body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-  .profile-container { padding: 3rem 1rem; }
+  body { background-color: #f0f2f8; font-family: 'Segoe UI', sans-serif; }
+  .profile-container { max-width: 1200px; margin:auto; padding:2rem 1rem; }
 
-  /* General Cards */
-  .profile-card, .management-section, .dashboard-section {
-    background: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    padding: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Profile Card */
+  .profile-card {
+    background: linear-gradient(145deg,#fff,#ffffff);
+    border-radius: 1rem; padding:2rem 1rem;
+    text-align:center; box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom:1rem;
   }
-  .profile-card:hover, .management-section:hover, .dashboard-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-  }
-
-  /* Profile Image */
-  .profile-img {
-    width: 160px; height: 160px; border-radius: 50%;
-    object-fit: cover; border: 4px solid #ccd6f6; margin-bottom: 1.5rem;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-  }
-  .profile-img:hover { transform: scale(1.05); border-color: #008cff; }
-
-  /* Profile Details */
-  .card-title { font-size: 2rem; font-weight: 600; color: #008cff; margin-bottom: 1rem; }
-  .profile-detail { font-size: 1rem; margin: 0.4rem 0; }
-  .profile-detail strong { color: #008cff; margin-right: 0.5rem; }
-
-  /* Edit Button */
+  .profile-card:hover { transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.12); }
+  .profile-img { width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid #008cff; margin-bottom:1rem; transition: transform 0.3s, border-color 0.3s; }
+  .profile-img:hover { transform:scale(1.05); border-color:#00d4ff; }
+  .card-title { font-size:1.6rem; font-weight:600; color:#008cff; margin-bottom:0.5rem; }
+  .profile-detail { font-size:1rem; margin:0.4rem 0; }
+  .profile-detail strong { color:#008cff; }
   .btn-edit {
-    margin-top: 1.5rem;
-    border-radius: 50px;
-    padding: 0.6rem 1.8rem;
-    font-weight: 500;
-    background: linear-gradient(90deg, #008cff, #00d4ff);
-    color: #fff;
-    border: none;
-    text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top:1rem; padding:0.5rem 1.5rem; border-radius:50px;
+    background: linear-gradient(90deg,#008cff,#00d4ff); color:#fff;
+    font-weight:500; text-decoration:none; display:inline-block;
+    transition: all 0.3s;
   }
-  .btn-edit:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,140,255,0.3);
-    background: linear-gradient(90deg, #006fcc, #00b8e6);
-  }
+  .btn-edit:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,140,255,0.3); }
 
   /* Management Section */
-  .management-section h4, .dashboard-section h4 { color: #008cff; margin-bottom: 1rem; }
-
+  .management-section {
+    background: linear-gradient(145deg,#fff,#ffffff);
+    border-radius: 1rem; padding:2rem 1rem;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom:1rem;
+  }
+  .management-section:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+  .management-section h4 { color:#008cff; margin-bottom:1.2rem; font-size:1.3rem; }
   .action-btn {
-    width: 100%; display: flex; justify-content: space-between; align-items: center;
-    padding: 0.9rem 1.2rem;
-    border-radius: 0.75rem;
-    border: none; font-size: 1rem; font-weight: 500;
-    color: #333; background: #f5f6fa; margin-bottom: 0.8rem;
-    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    text-decoration: none;
+    display:flex; justify-content:space-between; align-items:center;
+    background:#f5f6fa; color:#333; padding:0.8rem 1rem; border-radius:0.75rem;
+    margin-bottom:0.6rem; font-weight:500; text-decoration:none; transition: all 0.3s;
+    box-shadow:0 4px 15px rgba(0,0,0,0.06);
   }
-  .action-btn i:first-child { color: #008cff; font-size: 1.2rem; transition: color 0.3s ease, transform 0.3s ease; }
-  .action-btn:hover {
-    background: linear-gradient(90deg, #008cff, #00d4ff);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,140,255,0.25);
-  }
-  .action-btn:hover i:first-child { color: #fff; transform: scale(1.2); }
+  .action-btn i:first-child { color:#008cff; font-size:1.2rem; }
+  .action-btn:hover { background: linear-gradient(90deg,#008cff,#00d4ff); color:#fff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,140,255,0.25); }
+  .action-btn:hover i:first-child { color:#fff; transform:scale(1.2); }
   .action-btn i:last-child { transition: transform 0.3s ease; }
   .action-btn:hover i:last-child { transform: translateX(5px); }
 
-  /* Dashboard Metrics & Meters */
-  .metric-card, .meter-card {
-    text-align: center;
-    padding: 1rem;
-    background: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    margin: 0.5rem;
-    max-width: 12rem;
-    flex: 1 1 auto;
+  /* Metrics Row */
+  .metrics-row {
+    display:flex; flex-wrap:wrap; gap:0.8rem; margin-top:1.5rem;
   }
-  .metric-card h6, .meter-card h6 { margin-bottom: 0.5rem; color: #008cff; font-weight: 600; }
-  .metric-card p { font-size: 1.5rem; font-weight: 600; margin: 0; }
+  .metric-card {
+    flex:1 1 calc(20% - 0.5rem);
+    background: linear-gradient(145deg,#fff,#f7f9fc);
+    border-radius:1rem; padding:1.2rem; text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06); cursor:pointer; transition:all 0.3s;
+  }
+  .metric-card:hover { transform:translateY(-3px); box-shadow:0 12px 25px rgba(0,0,0,0.12); }
+  .metric-card h6 { margin-bottom:0.4rem; color:#008cff; font-weight:600; font-size:1rem; }
+  .metric-card p { font-size:1.5rem; font-weight:600; margin:0; }
 
-  @media (max-width: 768px) {
-    .profile-container { padding: 2rem 0.5rem; }
-    .profile-img { width: 130px; height: 130px; }
-    .metric-card, .meter-card { max-width: 100%; }
+  /* Charts Row */
+  .charts-row {
+    display:flex; flex-wrap:wrap; gap:2rem; justify-content:center; margin-top:2rem;
+  }
+  .meter-card, .revenue-charts {
+    flex:1 1 300px; background:#fff; border-radius:1rem; padding:2rem; text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06); transition:all 0.3s;
+  }
+  .meter-card:hover, .revenue-charts:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(0,0,0,0.12); }
+  .meter-card h6, .revenue-charts h6 { color:#008cff; font-weight:600; margin-bottom:1rem; }
+  .meter-card canvas, .revenue-charts canvas { width:100% !important; height:280px !important; }
+
+  @media (max-width:768px) {
+    .metric-card, .meter-card, .revenue-charts { flex:1 1 100%; max-width:500px; }
+    .charts-row { flex-direction:column; align-items:center; }
   }
 </style>
 
 <div class="profile-container">
-  <div class="row justify-content-center g-4">
+  <div class="row g-4 justify-content-center">
 
     <!-- Profile Card -->
-    <div class="col-md-5">
-      <div class="profile-card text-center">
+    <div class="col-md-4">
+      <div class="profile-card">
         <img src="<%= user.avatar || 'https://placehold.co/400x400/ececec/008cff' %>" class="profile-img" alt="<%= user.username %>">
         <h5 class="card-title"><%= user.username %></h5>
-        <div class="profile-detail"><strong>Email:</strong> <span><%= user.email %></span></div>
-        <div class="profile-detail"><strong>Joined:</strong> <span><%= user.createdAt ? new Date(user.createdAt).toDateString() : "N/A" %></span></div>
-        <a href="/users/profile/edit" class="btn btn-edit"><i class="fas fa-pencil-alt me-2"></i>Edit Profile</a>
+        <div class="profile-detail"><strong>Email:</strong> <%= user.email %></div>
+        <div class="profile-detail"><strong>Joined:</strong> <%= user.createdAt ? new Date(user.createdAt).toDateString() : "N/A" %></div>
+        <div class="profile-detail"><strong>Phone:</strong> <%= user.phone || "N/A" %></div>
+        <div class="profile-detail"><strong>Address:</strong> <%= user.address || "N/A" %></div>
+        <a href="/users/profile/edit" class="btn-edit"><i class="fas fa-pencil-alt me-2"></i>Edit Profile</a>
       </div>
     </div>
 
@@ -111,7 +100,7 @@
       <div class="management-section">
         <h4><i class="fas fa-tasks me-2"></i> Management</h4>
         <h6 class="mt-3"><strong>Host Actions</strong></h6>
-        <a href="/users/host/properties" class="action-btn"><span><i class="fas fa-home me-2"></i>All Listed Properties</span><i class="fas fa-chevron-right"></i></a>
+        <a href="/users/host/properties" class="action-btn"><span><i class="fas fa-home me-2"></i>All Properties</span><i class="fas fa-chevron-right"></i></a>
         <a href="/users/host/bookings/upcoming" class="action-btn"><span><i class="fas fa-door-open me-2"></i>Upcoming Guests</span><i class="fas fa-chevron-right"></i></a>
         <a href="/users/host/bookings/history" class="action-btn"><span><i class="fas fa-history me-2"></i>Past Guests</span><i class="fas fa-chevron-right"></i></a>
 
@@ -122,113 +111,118 @@
       </div>
     </div>
 
-    <!-- Dashboard Section -->
-    <div class="col-12 mt-5">
-      <div class="dashboard-section">
-        <h4><i class="fas fa-tachometer-alt me-2"></i> Dashboard</h4>
-
-        <!-- Combined Metrics Row -->
-        <div class="d-flex flex-wrap justify-content-center mt-3">
-          <div class="metric-card"><h6>Total Properties</h6><p class="text-primary"><%= dashboard.owner.totalProperties || 0 %></p></div>
-          <div class="metric-card"><h6>Pending Bookings</h6><p class="text-warning"><%= dashboard.owner.pendingBookings || 0 %></p></div>
-          <div class="metric-card"><h6>Upcoming Check-ins</h6><p class="text-success"><%= dashboard.owner.upcomingCheckins || 0 %></p></div>
-          <div class="metric-card"><h6>Total Revenue</h6><p class="text-danger">$<%= dashboard.owner.totalRevenue || 0 %></p></div>
-          <div class="metric-card"><h6>Upcoming Stays</h6><p class="text-info"><%= dashboard.guest.upcoming || 0 %></p></div>
-          <div class="metric-card"><h6>Completed Stays</h6><p class="text-success"><%= dashboard.guest.completed || 0 %></p></div>
-          <div class="metric-card"><h6>Total Bookings</h6><p class="text-primary"><%= dashboard.guest.totalBookings || 0 %></p></div>
-          <div class="metric-card"><h6>Pending %</h6><p class="text-warning"><%= dashboard.owner.pendingBookingsPercent || 0 %>%</p></div>
+    <!-- Metrics Row -->
+    <div class="col-12 mt-4">
+      <div class="metrics-row">
+        <div class="metric-card" onclick="window.location.href='/users/host/properties'">
+          <h6>Total Properties</h6>
+          <p class="text-primary"><%= dashboard.owner.totalProperties || 0 %></p>
         </div>
-
-        <!-- Meters Row -->
-        <div class="d-flex flex-wrap justify-content-center mt-4">
-          <div class="meter-card"><h6>Total Revenue</h6><canvas id="revenueMeter" width="85" height="85"></canvas></div>
-          <div class="meter-card"><h6>Occupancy Rate</h6><canvas id="occupancyMeter" width="85" height="85"></canvas></div>
-          <div class="meter-card"><h6>Completed Stays</h6><canvas id="completedMeter" width="85" height="85"></canvas></div>
-          <div class="meter-card"><h6>Pending %</h6><canvas id="pendingMeter" width="85" height="85"></canvas></div>
+        <div class="metric-card" onclick="window.location.href='/users/host/bookings/upcoming'">
+          <h6>Pending Bookings</h6>
+          <p class="text-warning"><%= dashboard.owner.pendingBookings || 0 %></p>
         </div>
-
-        <!-- Charts -->
-        <div class="row mt-4">
-          <div class="col-md-6"><canvas id="revenueChart"></canvas></div>
-          <div class="col-md-6"><canvas id="occupancyChart"></canvas></div>
+        <div class="metric-card">
+          <h6>Upcoming Check-ins</h6>
+          <p class="text-success"><%= dashboard.owner.upcomingCheckins || 0 %></p>
+        </div>
+        
+        <div class="metric-card">
+          <h6>Cancelled Bookings</h6>
+          <p class="text-danger"><%= dashboard.owner.cancelledBookings || 0 %></p>
+        </div>
+        <div class="metric-card">
+          <h6>Total Revenue</h6>
+          <p class="text-danger">₹<%= dashboard.owner.totalRevenue || 0 %></p>
         </div>
       </div>
     </div>
 
+    <!-- Charts Row -->
+    <div class="col-12 mt-4">
+      <div class="charts-row">
+        <div class="meter-card">
+          <h6>Occupancy Rate</h6>
+          <canvas id="occupancyMeter"></canvas>
+        </div>
+        <div class="meter-card">
+          <h6>Completed Stays</h6>
+          <canvas id="completedMeter"></canvas>
+        </div>
+        <div class="meter-card">
+          <h6>Cancelled Bookings</h6>
+          <canvas id="cancelledMeter"></canvas>
+        </div>
+      </div>
+
+      <div class="charts-row mt-4">
+        <div class="revenue-charts">
+          <h6>Revenue % by Property</h6>
+          <canvas id="revenuePieChart"></canvas>
+        </div>
+        <div class="revenue-charts">
+          <h6>Revenue (₹) by Property</h6>
+          <canvas id="revenueBarChart"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<!-- Add a hidden container with JSON data -->
+
 <div id="dashboardData" data-json='<%= JSON.stringify(dashboard || {}) %>' style="display:none;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Parse dashboard data from the hidden container
-  const dashboardElement = document.getElementById('dashboardData');
-  const dashboardData = JSON.parse(dashboardElement.dataset.json || '{}');
+document.addEventListener('DOMContentLoaded', function(){
+  const dashboardData = JSON.parse(document.getElementById('dashboardData').dataset.json || '{}');
 
-  function createMeter(id, value, gradientColors) {
+  function createMeter(id,value,colors,label){
     const ctx = document.getElementById(id).getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 150);
-    gradient.addColorStop(0, gradientColors[0]);
-    gradient.addColorStop(1, gradientColors[1]);
-
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Used','Remaining'],
-        datasets: [{
-          data: [value, 100 - value],
-          backgroundColor: [gradient, '#eee'],
-          borderWidth: 2,
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        cutout: '65%',
-        plugins: { legend: { display: false }, tooltip: { enabled: false } }
-      }
+    const gradient = ctx.createLinearGradient(0,0,0,150);
+    gradient.addColorStop(0,colors[0]); gradient.addColorStop(1,colors[1]);
+    return new Chart(ctx,{
+      type:'doughnut',
+      data:{ labels:[label,'Remaining'], datasets:[{data:[value,100-value], backgroundColor:[gradient,'#eee'], borderWidth:2}] },
+      options:{ cutout:'70%', plugins:{legend:{display:false}, tooltip:{enabled:true}} }
     });
   }
 
-  const totalRevenuePct = Math.min((dashboardData.owner?.totalRevenue || 0)/1000, 100);
-  const occupancyPct = Math.min(dashboardData.owner?.occupancyRate || 50, 100);
-  const completedPct = dashboardData.guest?.totalBookings
-    ? ((dashboardData.guest.totalBookings - dashboardData.owner.pendingBookings) / dashboardData.guest.totalBookings) * 100
-    : 0;
-  const pendingPct = 100 - completedPct;
+  createMeter('occupancyMeter', Math.min(dashboardData.owner.occupancyRate||0,100), ['#28a745','#85e085'],'Occupancy');
+  createMeter('completedMeter', Math.min(dashboardData.guest.completedPercent||0,100), ['#6f42c1','#b38ffb'],'Completed');
+  createMeter('cancelledMeter', Math.min(dashboardData.owner.cancelledPercent||0,100), ['#dc3545','#ff6b6b'],'Cancelled');
 
-  createMeter('revenueMeter', totalRevenuePct, ['#008cff','#00d4ff']);
-  createMeter('occupancyMeter', occupancyPct, ['#28a745','#85e085']);
-  createMeter('completedMeter', completedPct, ['#6f42c1','#b38ffb']);
-  createMeter('pendingMeter', pendingPct, ['#fd7e14','#ffbb66']);
+  const revenueData = dashboardData.owner.revenueData || [];
+  const totalRevenue = revenueData.reduce((sum,val)=>sum+val,0);
+  const revenuePercentages = revenueData.map(val => totalRevenue ? ((val/totalRevenue)*100).toFixed(1) : 0);
+  const revenueLabels = dashboardData.owner.revenueLabels || [];
+  const revenueColors = revenueLabels.map((_,i)=>`hsl(${(i*60)%360},70%,50%)`);
 
-  // Revenue Line Chart
-  new Chart(document.getElementById('revenueChart').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: dashboardData.owner?.revenueLabels || [],
-      datasets: [{
-        label: 'Revenue',
-        data: dashboardData.owner?.revenueData || [],
-        borderColor: '#008cff',
-        backgroundColor: 'rgba(0,140,255,0.2)',
-        fill: true
-      }]
+  new Chart(document.getElementById('revenuePieChart'),{
+    type:'doughnut',
+    data:{
+      labels: revenueLabels.map((label,i)=>`${label} (${revenuePercentages[i]}%)`),
+      datasets:[{data: revenuePercentages, backgroundColor: revenueColors, borderWidth:2}]
     },
-    options: { responsive: true, plugins: { legend: { display: true } } }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      cutout:'60%',
+      plugins:{legend:{position:'bottom'}}
+    }
   });
 
-  // Occupancy Bar Chart
-  new Chart(document.getElementById('occupancyChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: dashboardData.owner?.occupancyLabels || [],
-      datasets: [{
-        label: 'Occupancy',
-        data: dashboardData.owner?.occupancyData || [],
-        backgroundColor: '#008cff'
-      }]
+  new Chart(document.getElementById('revenueBarChart'), {
+    type:'bar',
+    data:{
+      labels: revenueLabels,
+      datasets:[{label:'Revenue (₹)', data: revenueData, backgroundColor:'#008cff'}]
     },
-    options: { responsive: true, plugins: { legend: { display: true } } }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true}}
+    }
   });
+});
 </script>

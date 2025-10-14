@@ -112,6 +112,10 @@ app.use("/listings/:id/reviews/" ,reviewRouter );
 app.use("/users" , userRouter);
 app.use("/listings/:id/booking", bookingRoute);
 
+// Endpoint to serve Geoapify API key
+app.get("/api/geoapify-key", (req, res) => {
+    res.json({ apiKey: process.env.GEOAPIFY_SECRET });
+});
 
 
 

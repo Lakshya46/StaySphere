@@ -11,8 +11,8 @@ module.exports.renderSignUp = (req, res) => {
 
 module.exports.userSignup = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
-    const newUser = new User({ username, email });
+    const { username, email, password, phone, name } = req.body; // include phone and name
+    const newUser = new User({ username, email, phone, name });   // save them to DB
     const registeredUser = await User.register(newUser, password);
 
     req.login(registeredUser, (e) => {
@@ -25,6 +25,7 @@ module.exports.userSignup = async (req, res, next) => {
     res.redirect("/users/signup");
   }
 };
+
 
 module.exports.renderLogin = (req, res) => {
   res.render("users/login");
@@ -58,55 +59,94 @@ module.exports.userLogout = (req, res, next) => {
 // =======================
 // PROFILE
 // =======================
+
+
+
+
 module.exports.renderProfile = async (req, res) => {
   const user = await User.findById(req.user._id).populate("wishlist");
 
+  const today = new Date();
+
   // Guest Stats
   const guestBookings = await Booking.find({ user: req.user._id }).populate("listing");
-  const upcomingGuest = guestBookings.filter(b => new Date(b.startDate) > new Date()).length;
-  const completedGuest = guestBookings.filter(b => new Date(b.startDate) <= new Date()).length;
+  const upcomingGuest = guestBookings.filter(b => new Date(b.startDate) > today).length;
+  const completedGuest = guestBookings.filter(b => new Date(b.startDate) <= today && b.status === "confirmed").length;
 
   // Host Stats
   const hostListings = await Listing.find({ owner: req.user._id });
   let pendingHostBookings = 0;
+  let cancelledHostBookings = 0;
+  let upcomingCheckins = 0;
   let totalRevenue = 0;
+  const occupancyLabels = [];
+  const occupancyData = [];
+  const revenueLabels = [];
+  const revenueData = [];
+
+  const targetRevenuePerListing = 1000; // you can adjust as needed
 
   for (let listing of hostListings) {
-    const pending = await Booking.find({ listing: listing._id, status: "pending" });
-    const confirmed = await Booking.find({ listing: listing._id, status: "confirmed" });
+    const bookings = await Booking.find({ listing: listing._id });
+
+    const pending = bookings.filter(b => b.status === "pending");
+    const confirmed = bookings.filter(b => b.status === "confirmed");
+    const cancelled = bookings.filter(b => b.status === "cancelled");
 
     pendingHostBookings += pending.length;
-    totalRevenue += confirmed.reduce((sum, b) => sum + b.totalPrice, 0);
+    cancelledHostBookings += cancelled.length;
+
+    // Upcoming check-ins (confirmed bookings with startDate > today)
+    upcomingCheckins += confirmed.filter(b => new Date(b.startDate) > today).length;
+
+    // Revenue
+    const listingRevenue = confirmed.reduce((sum, b) => sum + b.totalPrice, 0);
+    totalRevenue += listingRevenue;
+
+    // Occupancy % (confirmed / total bookings)
+    const totalBookings = bookings.length;
+    const occupancyPercent = totalBookings ? Math.round((confirmed.length / totalBookings) * 100) : 0;
+
+    occupancyLabels.push(listing.title);
+    occupancyData.push(occupancyPercent);
+
+    revenueLabels.push(listing.title);
+    revenueData.push(listingRevenue);
   }
+
+  // Pie chart percentages
+  const totalBookingsCount = pendingHostBookings + cancelledHostBookings + upcomingCheckins;
+  const cancelledPercent = totalBookingsCount ? Math.round((cancelledHostBookings / totalBookingsCount) * 100) : 0;
+  const totalRevenuePercent = hostListings.length ? Math.min(Math.round((totalRevenue / (hostListings.length * targetRevenuePerListing)) * 100), 100) : 0;
+  const occupancyRate = hostListings.length ? Math.round((upcomingCheckins / (pendingHostBookings + upcomingCheckins + cancelledHostBookings)) * 100) : 0;
+  const completedPercent = guestBookings.length ? Math.round((completedGuest / guestBookings.length) * 100) : 0;
 
   const dashboard = {
     guest: {
       totalBookings: guestBookings.length,
       upcoming: upcomingGuest,
-      completed: completedGuest
+      completed: completedGuest,
+      completedPercent
     },
     owner: {
       totalProperties: hostListings.length,
       pendingBookings: pendingHostBookings,
+      cancelledBookings: cancelledHostBookings,
+      upcomingCheckins,
       totalRevenue,
-      pendingBookingsPercent: guestBookings.length
-        ? Math.round((pendingHostBookings / guestBookings.length) * 100)
-        : 0,
-      occupancyRate: hostListings.length ? Math.round((totalRevenue / (hostListings.length * 1000)) * 100) : 50, // example
-      revenueLabels: [], // add labels if using charts
-      revenueData: [],
-      occupancyLabels: [],
-      occupancyData: []
+      totalRevenuePercent,
+      occupancyRate,
+      revenueLabels,
+      revenueData,
+      occupancyLabels,
+      occupancyData,
+      cancelledPercent
     }
   };
 
   res.render("users/profile", { user, dashboard });
 };
 
-module.exports.renderEditProfile = async (req, res) => {
-  const user = await User.findById(req.user._id);
-  res.render("users/editProfile", { user });
-};
 
 module.exports.updateProfile = async (req, res) => {
   try {
@@ -173,3 +213,7 @@ module.exports.toggleFavorite = async (req, res) => {
   res.json({ success: true, added });
 };
 
+
+module.exports.renderEditProfile = (req, res) => {
+  res.render("users/editProfile", { user: req.user });
+};

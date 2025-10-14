@@ -1,143 +1,253 @@
 <% layout("./layouts/boilerplate") %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <body class="bg-light">
+  <div class="container py-5">
 
-<div class="container py-5">
+    <!-- Heading -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Explore Stays</h2>
+      <p class="text-muted">Find your perfect stay for students and professionals at the best prices</p>
+    </div>
 
-  <!-- Heading -->
-  <div class="text-center mb-5">
-    <h2 class="fw-bold">Explore Stays</h2>
-    <p class="text-muted">Find your perfect stay for students and professionals at the best prices</p>
-  </div>
+    <!-- Search & Filter -->
+    <div class="card mb-5 p-4 shadow-sm rounded-4">
+      <form method="GET" action="/listings" class="row g-3 align-items-end" id="filterForm">
 
-  <!-- Search & Filter -->
-  <div class="card mb-5 p-4 shadow-sm rounded-4">
-    <form method="GET" action="/listings" class="row g-3 align-items-end">
-
-      <!-- Search Fields -->
-      <div class="col-md-3">
-        <label class="form-label">Search</label>
-        <input type="text" name="q" class="form-control" placeholder="Search by title or keywords" value="<%= query?.q || '' %>">
-      </div>
-
-      <div class="col-md-3">
-        <label class="form-label">City / Area</label>
-        <input type="text" name="city" class="form-control" placeholder="Delhi, Mumbai..." value="<%= query?.city || '' %>">
-      </div>
-
-      <div class="col-md-2">
-        <label class="form-label">Min Price (₹)</label>
-        <input type="number" name="minPrice" class="form-control" min="0" value="<%= query?.minPrice || '' %>">
-      </div>
-
-      <div class="col-md-2">
-        <label class="form-label">Max Price (₹)</label>
-        <input type="number" name="maxPrice" class="form-control" min="0" value="<%= query?.maxPrice || '' %>">
-      </div>
-
-      <div class="col-md-2">
-        <label class="form-label">BHK Type</label>
-        <select class="form-select" name="bhkType">
-          <option value="">Any</option>
-          <option value="1BHK" <%= query?.bhkType==='1BHK'?'selected':'' %>>1BHK</option>
-          <option value="2BHK" <%= query?.bhkType==='2BHK'?'selected':'' %>>2BHK</option>
-          <option value="3BHK" <%= query?.bhkType==='3BHK'?'selected':'' %>>3BHK</option>
-          <option value="4BHK+" <%= query?.bhkType==='4BHK+'?'selected':'' %>>4BHK+</option>
-          <option value="Studio" <%= query?.bhkType==='Studio'?'selected':'' %>>Studio</option>
-        </select>
-      </div>
-
-      <!-- Amenities -->
-      <div class="col-12">
-        <label class="form-label">Amenities</label><br>
-        <% const allAmenities = ["WiFi", "AC", "Parking"]; %>
-        <% allAmenities.forEach(function(amenity){ %>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="amenities" value="<%= amenity %>"
-              <%= query?.amenities && (Array.isArray(query.amenities)? query.amenities.includes(amenity) : query.amenities===amenity)?'checked':'' %>>
-            <label class="form-check-label"><%= amenity %></label>
-          </div>
-        <% }); %>
-      </div>
-
-      <div class="col-12 text-end">
-        <button type="submit" class="btn btn-primary">Search / Filter</button>
-        <a href="/listings" class="btn btn-outline-secondary ms-2">Reset</a>
-      </div>
-
-    </form>
-  </div>
-
-  <!-- Listings Grid -->
-  <div class="row g-4">
-    <% allListing.forEach(function(list){ %>
-      <div class="col-lg-4 col-md-6 col-sm-12">
-        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden listing-card hover-scale">
-
-          <a href="/listings/<%= list._id %>" class="text-decoration-none">
-
-            <!-- Carousel -->
-            <div id="carousel<%= list._id %>" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-inner">
-                <% if(list.featuredImage){ %>
-                  <div class="carousel-item active">
-                    <img src="<%= list.featuredImage.url %>" class="d-block w-100" alt="<%= list.title %>" style="height:250px; object-fit:cover;">
-                  </div>
-                <% } %>
-                <% if(list.images && list.images.length>0){ %>
-                  <% list.images.forEach(function(img){ %>
-                    <div class="carousel-item <%= !list.featuredImage?'active':'' %>">
-                      <img src="<%= img.url %>" class="d-block w-100" alt="<%= list.title %>" style="height:250px; object-fit:cover;">
-                    </div>
-                  <% }); %>
-                <% } %>
-              </div>
-
-              <% if ((list.images && list.images.length>0) || list.featuredImage) { %>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= list._id %>" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= list._id %>" data-bs-slide="next">
-                  <span class="carousel-control-next-icon"></span>
-                </button>
-              <% } %>
-            </div>
-
-            <!-- Card Body -->
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title fw-semibold text-dark text-truncate"><%= list.title %></h5>
-
-              <!-- BHK & Price Badges -->
-              <div class="mb-2">
-                <% if(list.bhkType){ %>
-                  <span class="badge bg-primary me-1"><i class="fa-solid fa-bed me-1"></i> <%= list.bhkType %></span>
-                <% } %>
-                <span class="badge bg-success">&#x20b9; <%= list.price?.toLocaleString("en-IN") || "N/A" %> / month</span>
-              </div>
-
-              <!-- Location -->
-              <p class="text-secondary small mb-0"><i class="fa-solid fa-location-dot me-1"></i> <%= list.area %>, <%= list.city %></p>
-            </div>
-
-          </a>
+        <!-- Search Fields -->
+        <div class="col-md-3">
+          <label class="form-label">Search</label>
+          <input type="text" name="q" class="form-control" placeholder="Search by title" value="<%= query?.q || '' %>">
         </div>
-      </div>
-    <% }); %>
+
+        <div class="col-md-3">
+          <label class="form-label">City / Area</label>
+          <input type="text" name="city" class="form-control" placeholder="Delhi, Mumbai..." value="<%= query?.city || '' %>">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Pin Code</label>
+          <input type="text" name="pinCode" class="form-control" placeholder="e.g., 110001" value="<%= query?.pinCode || '' %>">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Min Price (₹)</label>
+          <input type="number" name="minPrice" class="form-control" min="0" value="<%= query?.minPrice || '' %>">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Max Price (₹)</label>
+          <input type="number" name="maxPrice" class="form-control" min="0" value="<%= query?.maxPrice || '' %>">
+        </div>
+
+        <!-- Property Type -->
+        <div class="col-md-2">
+          <label class="form-label">Property Type</label>
+          <select class="form-select" name="propertyType" id="propertyType">
+            <option value="">Any</option>
+            <% ["Flat", "PG", "Studio"].forEach(type => { %>
+              <option value="<%= type %>" <%= query?.propertyType === type ? 'selected' : '' %>><%= type %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- BHK Type -->
+        <div class="col-md-2" id="bhkContainer" style="display:<%= query?.propertyType === 'Flat' ? 'block' : 'none' %>">
+          <label class="form-label">BHK Type</label>
+          <select class="form-select" name="bhkType" id="bhkType">
+            <option value="">Any</option>
+            <% ["1BHK", "2BHK", "3BHK", "4BHK+", "Studio"].forEach(type => { %>
+              <option value="<%= type %>" <%= query?.bhkType === type ? 'selected' : '' %>><%= type %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- Availability Date -->
+        <div class="col-md-4">
+          <label class="form-label">Available From - To</label>
+          <input type="text" id="availableRange" class="form-control" placeholder="Select date range"
+            value="<%= query?.availableFrom && query?.availableTo ? query.availableFrom + ' to ' + query.availableTo : '' %>">
+          <input type="hidden" name="availableFrom" id="availableFrom" value="<%= query?.availableFrom || '' %>">
+          <input type="hidden" name="availableTo" id="availableTo" value="<%= query?.availableTo || '' %>">
+        </div>
+
+        <!-- Nearby -->
+        <div class="col-md-2">
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="nearbyCheck" name="nearby" <%= query?.nearby ? 'checked' : '' %>>
+            <label class="form-check-label" for="nearbyCheck">Nearby</label>
+          </div>
+        </div>
+
+        <!-- Amenities -->
+        <div class="col-12">
+          <label class="form-label">Amenities</label><br>
+          <% ["WiFi", "AC", "Parking"].forEach(a => { %>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="amenities" value="<%= a %>"
+                <%= query?.amenities && (Array.isArray(query.amenities) ? query.amenities.includes(a) : query.amenities === a) ? 'checked' : '' %>>
+              <label class="form-check-label"><%= a %></label>
+            </div>
+          <% }) %>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-primary">Search / Filter</button>
+          <a href="/listings" class="btn btn-outline-secondary ms-2">Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Listings Grid -->
+    <div class="row g-4" id="listingGrid">
+      <% if (noResults) { %>
+        <div class="text-center py-5">
+          <h4 class="text-muted">No results found</h4>
+          <p>Try adjusting your filters or searching in a different area.</p>
+        </div>
+      <% } else { %>
+        <% allListing.forEach(list => { %>
+          <div class="col-lg-4 col-md-6 col-sm-12 listing-card-container">
+            <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden listing-card hover-scale">
+              <a href="/listings/<%= list._id %>" class="text-decoration-none">
+
+                <div id="carousel<%= list._id %>" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <% if (list.featuredImage) { %>
+                      <div class="carousel-item active">
+                        <img src="<%= list.featuredImage.url %>" class="d-block w-100" alt="<%= list.title %>"
+                          style="height:250px; object-fit:cover;">
+                      </div>
+                    <% } %>
+                    <% if (list.images && list.images.length > 0) { %>
+                      <% list.images.forEach(img => { %>
+                        <div class="carousel-item <%= !list.featuredImage ? 'active' : '' %>">
+                          <img src="<%= img.url %>" class="d-block w-100" alt="<%= list.title %>"
+                            style="height:250px; object-fit:cover;">
+                        </div>
+                      <% }) %>
+                    <% } %>
+                  </div>
+
+                  <% if ((list.images && list.images.length > 0) || list.featuredImage) { %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= list._id %>"
+                      data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= list._id %>"
+                      data-bs-slide="next">
+                      <span class="carousel-control-next-icon"></span>
+                    </button>
+                  <% } %>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title fw-semibold text-dark text-truncate"><%= list.title %></h5>
+
+                  <div class="mb-2">
+                    <% if (list.propertyType) { %>
+                      <span class="badge bg-info me-1"><i class="fa-solid fa-building me-1"></i> <%= list.propertyType %></span>
+                    <% } %>
+<% if (list.propertyType === 'Flat' && list.bhkType) { %>                      <span class="badge bg-primary me-1"><i class="fa-solid fa-bed me-1"></i> <%= list.bhkType %></span>
+                    <% } %>
+                    <span class="badge bg-success">₹ <%= list.price?.toLocaleString("en-IN") || 'N/A' %> / Day</span>
+                  </div>
+
+                  <p class="text-secondary small mb-0">
+                    <i class="fa-solid fa-location-dot me-1"></i>
+                    <%= list.area %>, <%= list.city %> - <%= list.pinCode || '' %>
+                  </p>
+
+                  <% if (list.availableDate) { %>
+                    <p class="text-secondary small mb-0">
+                      <i class="fa-solid fa-calendar-days me-1"></i>
+                      Available from: <%= list.availableDate.toISOString().split('T')[0] %>
+                    </p>
+                  <% } %>
+                </div>
+
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
   </div>
 
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Date Range Picker
+      flatpickr("#availableRange", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        defaultDate: ['<%= query?.availableFrom || "" %>', '<%= query?.availableTo || "" %>'],
+        onClose: function (selectedDates) {
+          if (selectedDates.length === 2) {
+            document.getElementById('availableFrom').value = selectedDates[0].toISOString().split('T')[0];
+            document.getElementById('availableTo').value = selectedDates[1].toISOString().split('T')[0];
+          } else {
+            document.getElementById('availableFrom').value = '';
+            document.getElementById('availableTo').value = '';
+          }
+        }
+      });
 
-<style>
-.hover-scale:hover {
-  transform: scale(1.03);
-  transition: all 0.3s ease-in-out;
-}
-.carousel-indicators button {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #000;
-}
-</style>
+      // Show/hide BHK
+      const propertyTypeSelect = document.getElementById('propertyType');
+      const bhkContainer = document.getElementById('bhkContainer');
+      propertyTypeSelect.addEventListener('change', () => {
+        bhkContainer.style.display = propertyTypeSelect.value === 'Flat' ? 'block' : 'none';
+        if (propertyTypeSelect.value !== 'Flat') document.getElementById('bhkType').value = '';
+      });
 
+      // Nearby geolocation
+      document.getElementById('filterForm').addEventListener('submit', function (e) {
+        const nearbyCheck = document.getElementById('nearbyCheck');
+        if (nearbyCheck.checked) {
+          e.preventDefault();
+          if (!navigator.geolocation) {
+            alert("Geolocation not supported");
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(pos => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            ['lat', 'lng'].forEach(key => {
+              let input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = key;
+              input.value = key === 'lat' ? lat : lng;
+              this.appendChild(input);
+            });
+            this.submit();
+          }, () => alert("Location access denied"));
+        }
+
+        // Validate price
+        const minPrice = parseInt(this.minPrice.value || 0);
+        const maxPrice = parseInt(this.maxPrice.value || 0);
+        if (minPrice && maxPrice && minPrice > maxPrice) {
+          e.preventDefault();
+          alert("Min price cannot be greater than max price");
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .hover-scale:hover {
+      transform: scale(1.03);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .carousel-indicators button {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #000;
+    }
+  </style>
 </body>

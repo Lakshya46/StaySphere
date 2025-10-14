@@ -1,18 +1,19 @@
 <% layout("./layouts/boilerplate") %>
 
-<!-- Flatpickr CSS -->
+<!-- Flatpickr & Leaflet CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
 <div class="container my-5">
-
   <% 
     let allImages = [];
-    if(listing.featuredImage) allImages.push(listing.featuredImage);
-    if(listing.images && listing.images.length > 0) allImages = allImages.concat(listing.images);
+    if (listing.featuredImage) allImages.push(listing.featuredImage);
+    if (listing.images && listing.images.length > 0) allImages = allImages.concat(listing.images);
   %>
 
   <!-- Image Carousel -->
-  <% if(allImages.length > 0){ %>
+  <% if (allImages.length > 0) { %>
     <div id="listingImagesCarousel" class="carousel slide mb-4 rounded-4 overflow-hidden shadow" data-bs-ride="carousel">
       <div class="carousel-inner">
         <% allImages.forEach((img, index) => { %>
@@ -21,47 +22,40 @@
           </div>
         <% }) %>
       </div>
-      <% if(allImages.length > 1){ %>
+      <% if (allImages.length > 1) { %>
         <button class="carousel-control-prev" type="button" data-bs-target="#listingImagesCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon bg-dark rounded-circle p-3 shadow"></span>
+          <span class="carousel-control-prev-icon bg-dark rounded-circle p-3 shadow" style="width:50px; height:50px;"></span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#listingImagesCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon bg-dark rounded-circle p-3 shadow"></span>
+          <span class="carousel-control-next-icon bg-dark rounded-circle p-3 shadow" style="width:50px; height:50px;"></span>
         </button>
       <% } %>
     </div>
-
-    <% if(allImages.length > 1){ %>
-      <div class="d-flex justify-content-center flex-wrap mb-4 gap-2">
-        <% allImages.forEach((img, idx) => { %>
-          <img src="<%= img.url %>" class="img-thumbnail rounded-3 shadow-sm thumbnail-img"
-               style="width:90px; height:65px; object-fit:cover; cursor:pointer;" 
-               data-bs-target="#listingImagesCarousel" data-bs-slide-to="<%= idx %>">
-        <% }) %>
-      </div>
-    <% } %>
   <% } %>
 
   <div class="row g-4">
     <!-- Listing Details -->
-    <div class="col-lg-8">
+    <div class="col-lg-8 order-1">
       <div class="card shadow-sm rounded-4 p-4 mb-4 border-0">
-        <!-- Title + Actions -->
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
           <h2 class="fw-bold text-dark mb-0"><%= listing.title %></h2>
           <div class="d-flex align-items-center gap-2 flex-wrap">
-            <% if(currentuser){ %>
+            <% if (currentuser) { %>
               <button type="button" class="wishlist-btn" data-listing="<%= listing._id %>">
                 <i class="<%= currentuser.wishlist.map(String).includes(listing._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
               </button>
+            <% } else { %>
+              <a href="/login" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <i class="far fa-heart me-1"></i> Login to Save
+              </a>
             <% } %>
-
-            <% if(currentuser && currentuser._id.toString() === listing.owner._id.toString()){ %>
+            <% if (currentuser && listing.owner && currentuser._id.toString() === listing.owner._id.toString()) { %>
               <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary btn-sm rounded-pill">
                 <i class="fas fa-edit me-1"></i>Edit
               </a>
               <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" class="d-inline">
-                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" onclick="return confirm('Are you sure you want to delete this listing?');">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill"
+                  onclick="return confirm('Are you sure you want to delete this listing?');">
                   <i class="fas fa-trash me-1"></i>Delete
                 </button>
               </form>
@@ -69,31 +63,53 @@
           </div>
         </div>
 
-        <p class="text-muted mb-2">Hosted by <span class="fw-semibold"><%= listing.owner.username %></span></p>
+        <p class="text-muted mb-2">
+          Hosted by <span class="fw-semibold"><%= listing.owner?.username || "Unknown" %></span>
+        </p>
         <p class="mb-3 text-secondary lh-lg"><%= listing.description %></p>
 
         <div class="d-flex align-items-center mb-3 flex-wrap gap-3">
-          <h4 class="fw-bold text-success">₹<%= listing.price.toLocaleString("en-IN") %> / month</h4>
-          <p class="text-secondary mb-0"><i class="fa-solid fa-location-dot me-2"></i><%= listing.area %>, <%= listing.city %></p>
+          <h4 class="fw-bold text-success">₹<%= listing.price.toLocaleString("en-IN") %> / Day </h4>
+          <p class="text-secondary mb-0">
+            <i class="fa-solid fa-location-dot me-2"></i>
+            <%= listing.area %>, <%= listing.city %>
+          </p>
         </div>
+
 
         <!-- Property Info -->
-        <div class="row mb-3 text-secondary small g-3">
-          <% if(listing.bhkType){ %>
-            <div class="col-md-3"><i class="fa-solid fa-bed me-2 text-primary"></i>BHK: <%= listing.bhkType %></div>
-          <% } %>
-          <% if(listing.bedrooms){ %>
-            <div class="col-md-3"><i class="fa-solid fa-door-closed me-2 text-primary"></i>Bedrooms: <%= listing.bedrooms %></div>
-          <% } %>
-          <% if(listing.bathrooms){ %>
-            <div class="col-md-3"><i class="fa-solid fa-shower me-2 text-primary"></i>Bathrooms: <%= listing.bathrooms %></div>
-          <% } %>
-        </div>
+      <!-- Property Info -->
+<div class="row mb-3 text-secondary small g-3">
+
+   <% if (listing.propertyType) { %>
+    <div class="col-md-3"><i class="fa-solid fa-building me-2 text-primary"></i>Type: <%= listing.propertyType %></div>
+  <% } %>
+  <% if (listing.propertyType === 'Flat' && listing.bhkType) { %>
+    <div class="col-md-3"><i class="fa-solid fa-bed me-2 text-primary"></i>BHK: <%= listing.bhkType %></div>
+  <% } %>
+
+  <% if ((listing.propertyType === 'Flat' || listing.propertyType === 'PG') && listing.bedrooms) { %>
+    <div class="col-md-3"><i class="fa-solid fa-door-closed me-2 text-primary"></i>Bedrooms: <%= listing.bedrooms %></div>
+  <% } %>
+
+  <% if ((listing.propertyType === 'Flat' || listing.propertyType === 'PG') && listing.bathrooms) { %>
+    <div class="col-md-3"><i class="fa-solid fa-shower me-2 text-primary"></i>Bathrooms: <%= listing.bathrooms %></div>
+  <% } %>
+</div>
+
+<!-- Additional Details -->
+<div class="row mb-3 text-secondary small g-3">
+  <% if (listing.pincode) { %>
+    <div class="col-md-3"><i class="fa-solid fa-envelope me-2 text-primary"></i>Pincode: <%= listing.pincode %></div>
+  <% } %>
+</div>
+
+
 
         <!-- Amenities -->
-        <% if(listing.amenities && listing.amenities.length > 0){ %>
+        <% if (listing.amenities && listing.amenities.length > 0) { %>
           <h6 class="mb-2 fw-semibold">Amenities</h6>
-          <div class="d-flex flex-wrap mb-2 gap-2">
+          <div class="d-flex flex-wrap mb-3 gap-2 align-items-center">
             <% listing.amenities.forEach(a => { %>
               <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
                 <i class="fa-solid fa-check text-success me-1"></i><%= a %>
@@ -101,134 +117,297 @@
             <% }) %>
           </div>
         <% } %>
+
+        <!-- Map -->
+        <% if (listing.latitude && listing.longitude) { %>
+          <div id="map" class="rounded-4 shadow-sm mb-3" style="height:300px;"></div>
+          <button id="locateBtn" class="btn savebtn mb-4">Show Route to Listing</button>
+        <% } %>
+
+        <!-- Booking Forms for mobile -->
+      <% if (currentuser && listing.owner && currentuser._id.toString() !== listing.owner._id.toString()) { %>
+<div class="d-lg-none mb-4">
+  <div class="card shadow-sm rounded-4 p-4 border-0">
+    <h5 class="fw-semibold mb-3">Book This Stay</h5>
+    <form id="bookingFormMobile" action="/listings/<%= listing._id %>/booking" method="POST">
+      <div class="mb-3">
+        <label class="form-label">Start Date <span class="text-danger">*</span></label>
+        <input type="text" id="checkInMobile" name="checkIn" class="form-control" required>
       </div>
-
-      <!-- Leave a Review -->
-      <% if(currentuser){ %>
-        <div class="card shadow-sm rounded-4 p-4 mb-4 border-0">
-          <h5 class="fw-semibold mb-3">Leave a Review</h5>
-          <form id="reviewForm" method="POST" action="/listings/<%= listing._id %>/reviews">
-            <fieldset class="starability-coinFlip mb-3">
-              <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked />
-              <% for(let i=1;i<=5;i++){ %>
-                <input type="radio" id="rate<%=i%>" name="review[rating]" value="<%=i%>" />
-                <label for="rate<%=i%>"><%=i%> ★</label>
-              <% } %>
-            </fieldset>
-            <textarea id="reviewComment" name="review[comment]" rows="3" class="form-control mb-3" placeholder="Write your review..."></textarea>
-            <button type="submit" class="btn savebtn w-100">Submit</button>
-          </form>
-        </div>
-      <% } %>
-
-      <!-- Reviews List -->
-      <div class="card shadow-sm rounded-4 p-4 border-0">
-        <h5 class="fw-semibold mb-3">Reviews</h5>
-        <div class="row g-3">
-          <% listing.reviews.forEach(review => { %>
-            <div class="col-md-6">
-              <div class="card border-0 shadow-sm h-100 rounded-3 position-relative">
-                <% if(currentuser && currentuser._id.toString() === review.author._id.toString()){ %>
-                  <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="position-absolute top-2 end-2">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this review?');">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </form>
-                <% } %>
-
-                <div class="card-body">
-                  <p class="mb-1 fw-semibold"><i class="fa-regular fa-user me-2 text-primary"></i><%= review.author.username %></p>
-                  <% if(review.comment){ %>
-                    <p class="text-secondary small"><%= review.comment %></p>
-                  <% } %>
-                  <% if(review.rating > 0){ %>
-                    <p class="starability-result" data-rating="<%=review.rating%>"></p>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-          <% }) %>
-        </div>
+      <div class="mb-3">
+        <label class="form-label">End Date <span class="text-danger">*</span></label>
+        <input type="text" id="checkOutMobile" name="checkOut" class="form-control" required>
       </div>
-    </div>
-
-    <!-- Booking Form -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm rounded-4 p-4 sticky-top" style="top:100px;">
-        <h5 class="fw-semibold mb-3">Book This Stay</h5>
-        <form action="/listings/<%= listing._id %>/booking" method="POST">
-          <div class="mb-3">
-            <label class="form-label">Start Date <span class="text-danger">*</span></label>
-            <input type="text" id="checkIn" name="checkIn" class="form-control" placeholder="Select Start Date" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">End Date <span class="text-danger">*</span></label>
-            <input type="text" id="checkOut" name="checkOut" class="form-control" placeholder="Select End Date" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Guests <span class="text-danger">*</span></label>
-            <input type="number" name="guests" min="1" required class="form-control">
-          </div>
-          <button type="submit" class="btn savebtn w-100">Book Now</button>
-        </form>
+      <div class="mb-3">
+        <label class="form-label">Guests <span class="text-danger">*</span></label>
+        <input type="number" name="guests" min="1" class="form-control" required>
       </div>
-    </div>
+      <button type="submit" class="btn savebtn w-100">Book Now</button>
+    </form>
   </div>
 </div>
+<% } %>
 
-<!-- Flatpickr JS -->
+      </div>
+    </div>
+
+    <!-- Desktop Booking Sidebar -->
+    <% if (currentuser && listing.owner && currentuser._id.toString() !== listing.owner._id.toString()) { %>
+<div class="col-lg-4 d-none d-lg-block order-2">
+  <div class="card shadow-sm rounded-4 p-4 sticky-top" style="top:100px;">
+    <h5 class="fw-semibold mb-3">Book This Stay</h5>
+    <form id="bookingFormDesktop" action="/listings/<%= listing._id %>/booking" method="POST">
+      <div class="mb-3">
+        <label class="form-label">Start Date <span class="text-danger">*</span></label>
+        <input type="text" id="checkInDesktop" name="checkIn" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">End Date <span class="text-danger">*</span></label>
+        <input type="text" id="checkOutDesktop" name="checkOut" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Guests <span class="text-danger">*</span></label>
+        <input type="number" name="guests" min="1" class="form-control" required>
+      </div>
+      <button type="submit" class="btn savebtn w-100">Book Now</button>
+    </form>
+  </div>
+</div>
+<% } %>
+
+
+  </div>
+</div>
+<!-- Leave a Review --> <% if (currentuser) { %> <div class="card shadow-sm rounded-4 p-4 mb-4 border-0"> 
+  <h5 class="fw-semibold mb-3">Leave a Review</h5> 
+  <form id="reviewForm" method="POST" action="/listings/<%= listing._id %>/reviews"> 
+    <fieldset class="starability-coinFlip mb-3"> <% for (let i = 1; i <= 5; i++) { %> <input type="radio" id="rate<%= i %>" name="review[rating]" value="<%= i %>">
+       <label for="rate<%= i %>"><%= i %> ★</label> <% } %> </fieldset> 
+       <textarea id="reviewComment" name="review[comment]" rows="3" class="form-control mb-3" placeholder="Write your review..." required></textarea> 
+       <button type="submit" class="btn savebtn w-100">Submit Review</button> 
+      </form> </div>
+      
+      <% } %> 
+      <!-- Reviews Section -->
+        <div class="card shadow-sm rounded-4 p-4 border-0"> <h5 class="fw-semibold mb-4">Reviews</h5> 
+          <% if (!listing.reviews || listing.reviews.length === 0) { %> 
+            <p class="text-secondary text-center">No reviews yet. Be the first to share your experience!</p> <% }
+             else { %> <div class="row g-4"> <% listing.reviews.forEach(review => { %> <div class="col-12 col-md-6"> 
+              <div class="card border rounded-3 shadow-sm p-3 h-100"> 
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                   <div class="d-flex align-items-center gap-2"> <i class="fa-regular fa-user text-primary"></i> 
+                    <span class="fw-semibold"><%= review.author?.username || "Anonymous" %></span> 
+                    </div> <% if (currentuser && review.author && currentuser._id.toString() === review.author._id.toString()) { %> <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
+                       <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this review?');"> <i class="fas fa-trash"></i> </button> 
+                       </form> <% } %> 
+                       </div> <% if (review.rating > 0) { %>
+                         <div class="mb-2"> <% for (let i = 1; i <= 5; i++) { %> <i class="fa-star <%= i <= review.rating ? 'fas text-warning' : 'far text-muted' %>"></i> <% } %> </div>
+                          <% } %> <p class="text-secondary mb-0 review-content"><%= review.comment %></p> </div> </div> <% }) %> </div> <% } %> </div> </div> </div>
+
+<!-- JS Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-// Booking calendar initialization
-fetch(`/listings/<%= listing._id %>/availability`)
-  .then(res => res.json())
-  .then(bookings => {
-    const disabledRanges = bookings.map(b => ({ from:new Date(b.from), to:new Date(b.to) })).filter(Boolean);
-    const checkOutPicker = flatpickr("#checkOut",{dateFormat:"Y-m-d", minDate:"today", disable:disabledRanges});
-    flatpickr("#checkIn",{dateFormat:"Y-m-d", minDate:"today", disable:disabledRanges, onChange:function(selectedDates){
-      if(!selectedDates.length) return;
-      const checkInDate = selectedDates[0];
-      const updatedDisable = disabledRanges.map(r=> checkInDate>=r.from && checkInDate<=r.to ? {from:new Date(checkInDate.getTime()+86400000), to:r.to} : r);
-      checkOutPicker.set('minDate', checkInDate);
-      checkOutPicker.set('disable', updatedDisable);
-    }});
-  }).catch(err=>console.error(err));
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
 
-// Wishlist toggle
-document.querySelector(".wishlist-btn")?.addEventListener("click", async function(){
-  const listingId = this.dataset.listing;
-  try{
-    const res = await fetch(`/users/guest/favorites/${listingId}/toggle`, { method:"POST" });
-    const data = await res.json();
-    if(data.success){
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  // --------------------- Booking Calendar ---------------------
+  const forms = [
+    { checkIn: "#checkInDesktop", checkOut: "#checkOutDesktop" },
+    { checkIn: "#checkInMobile", checkOut: "#checkOutMobile" }
+  ];
+
+  try {
+    const res = await fetch(`/listings/<%= listing._id %>/availability`);
+    const bookings = await res.json();
+    const disabledRanges = (bookings || []).map(b => ({ from: new Date(b.from), to: new Date(b.to) }));
+
+    forms.forEach(f => {
+      const checkInEl = document.querySelector(f.checkIn);
+      const checkOutEl = document.querySelector(f.checkOut);
+      if (!checkInEl || !checkOutEl) return;
+
+      const checkOutPicker = flatpickr(checkOutEl, { dateFormat: "Y-m-d", minDate: "today", disable: disabledRanges });
+
+      flatpickr(checkInEl, {
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        disable: disabledRanges,
+        onChange: selectedDates => {
+          if (!selectedDates.length) return;
+          const checkInDate = selectedDates[0];
+          checkOutPicker.set('minDate', checkInDate);
+          const updatedDisable = disabledRanges.map(r =>
+            checkInDate >= r.from && checkInDate <= r.to
+              ? { from: new Date(checkInDate.getTime() + 86400000), to: r.to }
+              : r
+          );
+          checkOutPicker.set('disable', updatedDisable);
+        }
+      });
+    });
+  } catch (err) {
+    console.error("Flatpickr error:", err);
+  }
+
+  // --------------------- Wishlist ---------------------
+  document.querySelectorAll(".wishlist-btn").forEach(btn => {
+    btn.addEventListener("click", async function () {
+      const listingId = this.dataset.listing;
       const icon = this.querySelector("i");
-      data.added ? icon.classList.replace("far","fas") : icon.classList.replace("fas","far");
+      icon.classList.add("fa-bounce");
+      try {
+        const res = await fetch(`/users/guest/favorites/${listingId}/toggle`, { method: "POST" });
+        const data = await res.json();
+        if (data.success) data.added ? icon.classList.replace("far", "fas") : icon.classList.replace("fas", "far");
+      } catch {
+        alert("Server error while updating wishlist.");
+      } finally {
+        setTimeout(() => icon.classList.remove("fa-bounce"), 500);
+      }
+    });
+  });
+
+  // --------------------- Map & Routing ---------------------
+  // --------------------- Map & Routing ---------------------
+const lat = <%= listing.latitude ? JSON.stringify(listing.latitude) : "null" %>;
+const lng = <%= listing.longitude ? JSON.stringify(listing.longitude) : "null" %>;
+const title = <%- JSON.stringify(listing.title || "") %>;
+
+if (lat && lng) {
+  const map = L.map('map').setView([lat, lng], 15);
+  const res = await fetch('/api/geoapify-key');
+  const { apiKey } = await res.json();
+
+  L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${apiKey}`, {
+    maxZoom: 20,
+  }).addTo(map);
+
+  // Custom marker icons
+  const redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const blueIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  // Add listing marker (red)
+  const listingMarker = L.marker([lat, lng], { icon: redIcon })
+    .addTo(map)
+    .bindPopup(`<b>${title}</b><br>Destination`);
+
+  // Locate button
+  document.getElementById("locateBtn").addEventListener("click", () => {
+    map.locate({ setView: true, maxZoom: 16 });
+  });
+
+  // When location is found
+  map.on('locationfound', async (e) => {
+    const userLat = e.latlng.lat;
+    const userLng = e.latlng.lng;
+
+    // Add current user marker (blue)
+    const userMarker = L.marker([userLat, userLng], { icon: blueIcon })
+      .addTo(map)
+      .bindPopup("📍 You are here")
+      .openPopup();
+
+    try {
+      // Request route from Geoapify
+      const url = `https://api.geoapify.com/v1/routing?waypoints=${userLat},${userLng}|${lat},${lng}&mode=drive&apiKey=${apiKey}`;
+      const routeRes = await fetch(url);
+      const routeData = await routeRes.json();
+      const feature = routeData?.features?.[0];
+      if (!feature?.geometry?.coordinates) return;
+
+      // Flatten nested coordinates
+      function flattenCoords(arr) {
+        const coords = [];
+        function recurse(a) {
+          if (!Array.isArray(a)) return;
+          if (a.length === 2 && typeof a[0] === 'number') coords.push([a[1], a[0]]);
+          else a.forEach(recurse);
+        }
+        recurse(arr);
+        return coords;
+      }
+
+      const cleanCoords = flattenCoords(feature.geometry.coordinates);
+      if (cleanCoords.length) {
+        const polyline = L.polyline(cleanCoords, { color: 'green', weight: 5, opacity: 0.7 }).addTo(map);
+        map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+      }
+
+      // Show distance
+      const distanceMeters = feature?.properties?.distance;
+      const distanceKm = (distanceMeters / 1000).toFixed(2);
+      L.popup()
+        .setLatLng(cleanCoords[Math.floor(cleanCoords.length / 2)])
+        .setContent(`🚗 Distance: <b>${distanceKm} km</b>`)
+        .openOn(map);
+
+    } catch (err) {
+      console.error("Routing error:", err);
     }
-  }catch(err){ console.error(err); alert("Server error"); }
+  });
+
+  map.on('locationerror', e => console.warn("Location error:", e.message));
+}
+
+  // --------------------- Review Form Validation ---------------------
+  document.getElementById("reviewForm")?.addEventListener("submit", e => {
+  const rating = parseInt(document.querySelector('input[name="review[rating]"]:checked')?.value || 5);
+  const comment = document.getElementById("reviewComment")?.value.trim();
+  const flash = document.getElementById("flashMessage");
+
+  // Hide previous flash message
+  flash.classList.add("d-none");
+  flash.textContent = "";
+
+  // Validation
+  if (rating < 1) {
+    e.preventDefault();
+    flash.textContent = "Please provide at least 1 star rating.";
+    flash.classList.remove("d-none");
+    return;
+  }
+
+  if (!comment) {
+    e.preventDefault();
+    flash.textContent = "Review comment cannot be empty.";
+    flash.classList.remove("d-none");
+    return;
+  }
 });
 
-// Review form validation
-document.getElementById("reviewForm")?.addEventListener("submit", e=>{
-  const rating = parseInt(document.querySelector('input[name="review[rating]"]:checked').value);
-  const comment = document.getElementById("reviewComment").value.trim();
-  if(rating<1){ alert("Please provide at least 1 star rating."); e.preventDefault(); }
-  if(comment.length===0){ alert("Review comment cannot be empty."); e.preventDefault(); }
+
+
+
 });
 </script>
 
 <style>
-.thumbnail-img:hover { border:2px solid #6c757d; transform:scale(1.05); transition:0.2s; }
-.card h2, .card h5 { word-break:break-word; }
-.starability-result { display:inline-block; font-size:1rem; color:#008cf7; }
-.flatpickr-input { cursor:pointer; background-color:#fff; }
-
-.wishlist-btn { background:none; border:none; cursor:pointer; padding:0; }
-.wishlist-btn i { color:red; font-size:1.8rem; transition:0.2s; }
-.wishlist-btn:hover i { transform:scale(1.3); }
-
-.savebtn { background:linear-gradient(90deg,#008cff,#00d4ff); color:#fff; font-weight:600; font-size:1.1rem; padding:12px 0; border-radius:50px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,140,255,0.3); transition: transform 0.2s, box-shadow 0.2s, filter 0.2s; }
-.savebtn:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 6px 20px rgba(236,236,236,0.752); filter:brightness(1.1); }
-.savebtn:active { transform:translateY(0) scale(0.98); box-shadow:0 3px 10px rgba(0,140,255,0.3); }
-
-.position-absolute.top-2.end-2 { top:10px; right:10px; }
+body { background: #f8f9fa; }
+.card { border-radius: 1rem; }
+.carousel-inner img { object-fit: cover; border-radius: 1rem; }
+.wishlist-btn { background: none; border: none; cursor: pointer; padding: 0; }
+.wishlist-btn i { color: red; font-size: 1.8rem; transition: 0.3s; }
+.wishlist-btn i.fas { color: #ff4d6d; }
+.savebtn { background: linear-gradient(90deg, #008cff, #00d4ff); color: #fff; font-weight: 600; border: none; border-radius: 50px; padding: 12px 0; transition: 0.3s; }
+.savebtn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.fa-star { margin-right: 2px; }
+.flatpickr-input { cursor: pointer; background-color: #fff; }
+.review-content { white-space: pre-wrap; word-wrap: break-word; }
+@media(max-width:991px){
+  .sticky-top { position: relative !important; top: auto !important; }
+  .carousel-inner img { max-height: 400px; }
+  .card { margin-bottom: 1.5rem; }
+}
 </style>

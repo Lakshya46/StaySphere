@@ -197,9 +197,9 @@
 
 <script>
 (async () => {
-  const apiKey = await (await fetch('/api/geoapify-key')).json().then(d=>d.apiKey);
+  const apiKey = await (await fetch('/api/geoapify-key')).json().then(d => d.apiKey);
 
-  // Leaflet icon fix
+  // Fix for Leaflet marker icons
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -207,59 +207,76 @@
     shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   });
 
-  const map = L.map('map').setView([21.1458, 79.0882], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+  // Initialize the map
+  const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India by default
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
   let marker;
   const latInput = document.getElementById('latitude');
   const lonInput = document.getElementById('longitude');
   const input = document.getElementById('locationInput');
 
-  function setMarker(lat, lon, popupText="Selected Location") {
-    if(marker) map.removeLayer(marker);
-    marker = L.marker([lat, lon], { draggable: true }).addTo(map)
-               .bindPopup(popupText).openPopup();
-    latInput.value = lat; lonInput.value = lon;
+  // Function to place/update marker
+  function setMarker(lat, lon, popupText = "Selected Location") {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lon], { draggable: true })
+      .addTo(map)
+      .bindPopup(popupText)
+      .openPopup();
+    latInput.value = lat;
+    lonInput.value = lon;
+    map.setView([lat, lon], 17);
+
+    // Update lat/lon when marker is dragged
     marker.on('dragend', e => {
       const pos = e.target.getLatLng();
       latInput.value = pos.lat;
       lonInput.value = pos.lng;
     });
-    map.setView([lat, lon], 17);
   }
 
-  // Try high-accuracy geolocation
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(
-      pos => setMarker(pos.coords.latitude,pos.coords.longitude,"You are here"),
-      err => {
-        console.warn(err);
-        fetch('https://ipapi.co/json/').then(r=>r.json())
-          .then(data=>setMarker(data.latitude,data.longitude,"Approximate Location"))
-          .catch(()=>console.warn("IP fallback failed"));
-      },
-      { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
-    );
-  }
+  // Use Leaflet’s built-in geolocation
+  map.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true });
 
-  // Geoapify autocomplete
+  // When location is found
+  map.on('locationfound', e => {
+    setMarker(e.latitude, e.longitude, "You are here");
+  });
+
+  // When location access is denied or fails
+  map.on('locationerror', e => {
+    console.warn("Location not found:", e.message);
+    // Fallback: approximate location from IP
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => setMarker(data.latitude, data.longitude, "Approximate Location"))
+      .catch(() => console.warn("IP fallback failed"));
+  });
+
+  // Geoapify autocomplete for location search
   let timer;
   input.addEventListener('input', e => {
     clearTimeout(timer);
-    if(!e.target.value) return;
+    if (!e.target.value) return;
     timer = setTimeout(async () => {
-      try{
+      try {
         const res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(e.target.value)}&limit=5&apiKey=${apiKey}`);
         const features = (await res.json()).features;
-        if(features.length>0){
-          const [lon,lat] = features[0].geometry.coordinates;
-          setMarker(lat,lon,features[0].properties.formatted);
+        if (features.length > 0) {
+          const [lon, lat] = features[0].geometry.coordinates;
+          setMarker(lat, lon, features[0].properties.formatted);
         }
-      }catch(err){console.error(err);}
-    },300);
+      } catch (err) {
+        console.error(err);
+      }
+    }, 300);
   });
 })();
 </script>
+
 
 <style>
 .card {

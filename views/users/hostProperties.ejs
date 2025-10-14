@@ -1,21 +1,61 @@
 <% layout("./layouts/boilerplate") %>
 
-<div class="container mt-5">
-  <h3 class="mb-4"><i class="fas fa-home me-2"></i>All Listed Properties</h3>
+<div class="container my-5">
+  <!-- Page Title -->
+  <h3 class="mb-4 text-center text-primary fw-bold">
+    <i class="fas fa-home me-2 text-danger"></i> All Listed Properties
+  </h3>
 
-  <% if(listings.length === 0){ %>
-    <p>You have no listings yet.</p>
+  <% if (listings.length === 0) { %>
+    <div class="alert alert-info text-center py-4 rounded-4 shadow-sm">
+      <i class="fas fa-info-circle me-2"></i> You have no listings yet.
+    </div>
   <% } else { %>
     <div class="row g-4">
       <% listings.forEach(l => { %>
-        <div class="col-md-6">
-          <div class="card shadow-sm rounded-4">
-            <img src="<%= l.featuredImage?.url || 'https://placehold.co/600x400' %>" class="card-img-top" style="height: 250px; object-fit: cover;" alt="<%= l.title %>">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+          <div class="card property-card shadow-sm border-0 h-100">
+            <!-- Image -->
+            <a href="/listings/<%= l._id %>">
+              <img 
+                src="<%= l.featuredImage?.url || 'https://placehold.co/600x400' %>" 
+                class="card-img-top property-img" 
+                alt="<%= l.title %>">
+            </a>
+
+            <!-- Card Body -->
             <div class="card-body">
-              <h5 class="card-title"><%= l.title %></h5>
-              <p class="card-text text-secondary"><%= l.city %>, <%= l.area %></p>
-              <p class="fw-bold">₹<%= l.price.toLocaleString("en-IN") %> / month</p>
-              <a href="/listings/<%= l._id %>" class="btn btn-primary w-100">View Details</a>
+              <h5 class="card-title fw-semibold mb-2 text-dark">
+                <a href="/listings/<%= l._id %>" class="text-decoration-none text-dark">
+                  <%= l.title %>
+                </a>
+              </h5>
+
+              <!-- Location -->
+              <p class="text-muted mb-1">
+                <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                <%= l.city %><% if (l.area) { %>, <%= l.area %><% } %>
+              </p>
+
+              <!-- Price -->
+              <p class="fw-bold text-success mb-1">
+                <i class="fas fa-tag me-1"></i>
+                ₹<%= l.price.toLocaleString("en-IN") %> / month
+              </p>
+
+              <!-- Property Type + BHK -->
+              <p class="small text-muted mb-3">
+                <i class="fas fa-home text-warning me-1"></i>
+                <%= l.propertyType %>
+                <% if (l.propertyType && l.propertyType.toLowerCase() === 'flat' && l.bhkType) { %>
+                  | <%= l.bhkType %> BHK
+                <% } %>
+              </p>
+
+              <!-- Button -->
+              <a href="/listings/<%= l._id %>" class="btn btn-primary w-100 rounded-3">
+                <i class="fas fa-eye me-1"></i> View Details
+              </a>
             </div>
           </div>
         </div>
@@ -23,3 +63,51 @@
     </div>
   <% } %>
 </div>
+
+<style>
+/* Container */
+.container {
+  max-width: 1200px;
+}
+
+/* Card styling */
+.property-card {
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Image styling */
+.property-img {
+  height: 220px;
+  width: 100%;
+  object-fit: cover;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+/* Button hover */
+.property-card .btn-primary {
+  transition: all 0.3s ease;
+}
+.property-card .btn-primary:hover {
+  background-color: #0b5ed7;
+  transform: translateY(-2px);
+}
+
+/* Icon colors */
+.text-danger { color: #2f89ff !important; }  /* Airbnb Red */
+.text-success { color: #008a5a !important; } /* Green */
+.text-warning { color: #f9a825 !important; } /* Yellow */
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .property-img {
+    height: 180px;
+  }
+}
+</style>

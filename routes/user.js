@@ -8,6 +8,7 @@ const middleware = require("../middleware");
 const userController = require("../controllers/users");
 const { storage } = require("../cloudConfig"); // Cloudinary storage
 const upload = multer({ storage });
+const Listing = require("../models/listing"); // ADD THIS
 
 // =======================
 // AUTH ROUTES

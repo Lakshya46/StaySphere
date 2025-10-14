@@ -3,7 +3,6 @@ const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
 const engine = require('ejs-mate');
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const methodoverride = require("method-override");
 const ExpressError = require("./utils/ExpressError.js");
 
@@ -59,7 +58,7 @@ const store = MongoStore.create({
 });
 
 
-store.on("error" , ( )=>{
+store.on("error" , (err )=>{
     console.log("error in mongo session store" , err);
 
 })
@@ -106,7 +105,9 @@ app.get("/demouser" ,async (req, res) => {
     res.send(registeruser);
 });*/
 
-
+app.get('/', (req, res) => {
+    res.redirect("/listings")
+});
 app.use("/listings" ,listingRouter);
 app.use("/listings/:id/reviews/" ,reviewRouter );
 app.use("/users" , userRouter);

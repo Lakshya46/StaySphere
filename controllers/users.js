@@ -176,18 +176,6 @@ module.exports.updateProfile = async (req, res) => {
   }
 };
 
-// =======================
-// HOST ROUTES
-// =======================
-
-// Pending bookings awaiting host confirmation
-
-
-// Upcoming check-ins for host
-
-
-// All bookings for a specific property
-
 
 // =======================
 // FAVORITES / WISHLIST
@@ -216,4 +204,115 @@ module.exports.toggleFavorite = async (req, res) => {
 
 module.exports.renderEditProfile = (req, res) => {
   res.render("users/editProfile", { user: req.user });
+};
+
+
+module.exports.renderWishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("wishlist");
+    const wishlist = user.wishlist || []; // send as wishlist
+    res.render("users/wishlist", { wishlist });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Unable to load wishlist");
+    res.redirect("/users/profile");
+  }
+};
+
+
+module.exports.renderHostProperties = async (req, res) => {
+  const listings = await Listing.find({ owner: req.user._id });
+  res.render("users/hostProperties", { listings });
+};
+
+module.exports.renderHostUpcomingBookings = async (req, res) => {
+  try {
+    const today = new Date();
+    let upcomingBookings = [];
+
+    // Loop through all host listings
+    for (let listing of req.hostListings) {
+      const bookings = await Booking.find({ listing: listing._id, status: "confirmed" })
+        .populate("user")
+        .populate("listing");
+
+      const upcoming = bookings.filter(b => new Date(b.startDate) > today);
+      upcomingBookings.push(...upcoming);
+    }
+
+    // Sort by start date ascending
+    upcomingBookings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+    res.render("users/hostUpcomingBookings", { bookings: upcomingBookings });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not fetch upcoming bookings");
+    res.redirect("/users/profile");
+  }
+};
+
+
+
+module.exports.renderHostBookingHistory = async (req, res) => {
+  try {
+    const today = new Date();
+
+    // req.hostListings is set by the isHost middleware
+    const hostListingIds = req.hostListings.map(listing => listing._id);
+
+    // Fetch bookings for all host listings that are past (startDate <= today or cancelled)
+    const bookings = await Booking.find({ listing: { $in: hostListingIds } })
+      .populate("listing")
+      .populate("user") // guest info
+      .sort({ startDate: -1 });
+
+    // Only past bookings (completed or cancelled)
+    const pastBookings = bookings.filter(b => new Date(b.startDate) <= today || b.status === "cancelled");
+
+    res.render("users/hostBookingHistory", { bookings: pastBookings });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Unable to load past guest bookings");
+    res.redirect("/users/profile");
+  }
+};
+
+module.exports.renderGuestUpcomingBookings = async (req, res) => {
+  try {
+    const today = new Date();
+
+    // Fetch bookings for the logged-in guest with startDate in the future
+    const bookings = await Booking.find({ user: req.user._id, status: { $in: ["pending", "confirmed"] } })
+      .populate("listing")
+      .sort({ startDate: 1 }); // earliest upcoming first
+
+    const upcomingBookings = bookings.filter(b => new Date(b.startDate) > today);
+
+    res.render("users/guestUpcomingBookings", { bookings: upcomingBookings });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Unable to load upcoming bookings");
+    res.redirect("/users/profile");
+  }
+};
+
+// Guest Booking History
+module.exports.renderGuestBookingHistory = async (req, res) => {
+  try {
+    const today = new Date();
+
+    // Fetch all bookings for the logged-in guest
+    const bookings = await Booking.find({ user: req.user._id })
+      .populate("listing")
+      .sort({ startDate: -1 });
+
+    // Only past bookings (completed or cancelled)
+    const pastBookings = bookings.filter(b => new Date(b.startDate) <= today || b.status === "cancelled");
+
+    res.render("users/guestBookingHistory", { bookings: pastBookings });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Unable to load booking history");
+    res.redirect("/users/profile");
+  }
 };

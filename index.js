@@ -94,16 +94,6 @@ app.use((req, res, next) => {
     next();
 });
 
-/*
-app.get("/demouser" ,async (req, res) => {
-    let fakeUser = new User({
-        email : "xyz@gmail.com" ,
-        username :"delta"
-    });
-
-    let registeruser  = await User.register(fakeUser ,"helloworld");
-    res.send(registeruser);
-});*/
 
 app.get('/', (req, res) => {
     res.redirect("/listings")
@@ -127,16 +117,15 @@ app.use((req, res, next) => {
 
 app.use( ( err , req ,res ,next) =>{
 
-    //let  { statusCode = 500 , message = "something went wrong"} = err ;
-   
-    //res.status(statusCode).send(message);
      res.render("error.ejs" , { err});
 });
 
 
 
-app.listen(8080 , ()=>{
-    console.log("server has started")
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server has started on port ${PORT}`);
 });
 
 

@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const Booking = require("../models/booking");
 const Listing = require("../models/listing");
+const otpGenerator = require("otp-generator");
+const sendMail = require("../config/Mail.js")
 
 // =======================
 // AUTH
@@ -11,21 +13,130 @@ module.exports.renderSignUp = (req, res) => {
 
 module.exports.userSignup = async (req, res, next) => {
   try {
-    const { username, email, password, phone, name } = req.body; // include phone and name
-    const newUser = new User({ username, email, phone, name });   // save them to DB
-    const registeredUser = await User.register(newUser, password);
+    const { username, email, password, phone, name } = req.body;
 
-    req.login(registeredUser, (e) => {
-      if (e) return next(e);
-      req.flash("success", "Successfully registered");
-      res.redirect("/listings");
-    });
+    // 🔹 Check existing email
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      req.flash("error", "Email already exists");
+      return res.redirect("/users/signup");
+    }
+
+    // 🔹 Check existing username
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      req.flash("error", "Username already exists");
+      return res.redirect("/users/signup");
+    }
+
+    // 🔹 Password length check
+    if (!password || password.length < 6) {
+      req.flash("error", "Password must be at least 6 characters long");
+      return res.redirect("/users/signup");
+    }
+
+    // 1️⃣ Generate OTP (numeric only)
+const otp = otpGenerator.generate(6, {
+  digits: true,
+  lowerCaseAlphabets: false,
+  upperCaseAlphabets: false,
+  specialChars: false,
+});
+
+
+    const otpExpiry = Date.now() + 5 * 60 * 1000; // 5 mins
+
+    // 2️⃣ Save data temporarily in session
+    req.session.tempUser = {
+      username,
+      email,
+      name,
+      phone,
+      password,
+      otp,
+      otpExpiry,
+    };
+
+    // 3️⃣ Send OTP (email or SMS)
+    console.log("Signup OTP:", otp);
+    await sendMail(email, otp);
+
+    req.flash("success", "OTP sent to your email");
+    return res.redirect("/users/verify-otp");
+
   } catch (err) {
-    req.flash("error", err.message);
-    res.redirect("/users/signup");
+    console.error(err);
+    req.flash("error", "Signup failed. Please try again.");
+    return res.redirect("/users/signup");
   }
 };
 
+
+// =============================
+// RENDER OTP PAGE
+// =============================
+module.exports.renderOtpPage = (req, res) => {
+  if (!req.session.tempUser) {
+    req.flash("error", "Session expired. Please signup again.");
+    return res.redirect("/users/signup");
+  }
+  res.render("users/verifyOtp");
+};
+
+
+// =============================
+// STEP 2 → VERIFY OTP → CREATE USER
+// =============================
+module.exports.verifyOtp = async (req, res, next) => {
+  try {
+    const { otp } = req.body;
+
+    if (!req.session.tempUser) {
+      req.flash("error", "Session expired. Please signup again.");
+      return res.redirect("/users/signup");
+    }
+
+    const temp = req.session.tempUser;
+
+    // 🔹 Wrong OTP
+    if (otp !== temp.otp) {
+      req.flash("error", "Invalid OTP. Try again.");
+      return res.redirect("/users/verify-otp");
+    }
+
+    // 🔹 OTP expired
+    if (Date.now() > temp.otpExpiry) {
+      req.flash("error", "OTP expired. Please signup again.");
+      return res.redirect("/users/signup");
+    }
+
+    // 3️⃣ OTP verified → create real user
+    const newUser = new User({
+      username: temp.username,
+      email: temp.email,
+      phone: temp.phone,
+      name: temp.name,
+    });
+
+    const registeredUser = await User.register(newUser, temp.password);
+
+    // 4️⃣ Clear temporary signup data
+    req.session.tempUser = null;
+
+    // 5️⃣ Auto login
+    req.login(registeredUser, (err) => {
+      if (err) return next(err);
+
+      req.flash("success", "Account created successfully!");
+      return res.redirect("/listings");
+    });
+
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "OTP verification failed. Try again.");
+    return res.redirect("/users/verify-otp");
+  }
+};
 
 module.exports.renderLogin = (req, res) => {
   res.render("users/login");

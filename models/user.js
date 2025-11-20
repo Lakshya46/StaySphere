@@ -25,7 +25,20 @@ const userSchema = new Schema({
   wishlist: [{ type: Schema.Types.ObjectId, ref: "Listing" }],
   likes: [{ type: Schema.Types.ObjectId, ref: "Listing" }],
   bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }], // track user's bookings
-  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }]   // track reviews made by user
+  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }] ,
+  resetOtp:{
+        type:String
+    } ,
+    otpExpires:{
+        type:Date
+    } ,
+    isOtpVerified:{
+        type:Boolean,
+        default:false
+    }  
+  
+  
+  // track reviews made by user
 }, { timestamps: true });
 
 // Passport plugin for local authentication (username/password)

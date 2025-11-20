@@ -270,96 +270,121 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --------------------- Map & Routing ---------------------
   // --------------------- Map & Routing ---------------------
+// --------------------- Map & Routing (with Debug Logs) ---------------------
 const lat = <%= listing.latitude ? JSON.stringify(listing.latitude) : "null" %>;
 const lng = <%= listing.longitude ? JSON.stringify(listing.longitude) : "null" %>;
 const title = <%- JSON.stringify(listing.title || "") %>;
 
+console.log("📍 Listing Coordinates:", { lat, lng, title });
+
 if (lat && lng) {
   const map = L.map('map').setView([lat, lng], 15);
-  const res = await fetch('/api/geoapify-key');
-  const { apiKey } = await res.json();
+  console.log("🗺️ Map initialized");
 
-  L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${apiKey}`, {
-    maxZoom: 20,
-  }).addTo(map);
+  try {
+    const res = await fetch('/api/geoapify-key');
+    const { apiKey } = await res.json();
+    console.log("🔑 Geoapify API Key fetched:", apiKey ? "Received" : "Missing");
 
-  // Custom marker icons
-  const redIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
+    L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${apiKey}`, {
+      maxZoom: 20,
+    }).addTo(map);
 
-  const blueIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
+    const redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+    });
 
-  // Add listing marker (red)
-  const listingMarker = L.marker([lat, lng], { icon: redIcon })
-    .addTo(map)
-    .bindPopup(`<b>${title}</b><br>Destination`);
+    const blueIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+    });
 
-  // Locate button
-  document.getElementById("locateBtn").addEventListener("click", () => {
-    map.locate({ setView: true, maxZoom: 16 });
-  });
-
-  // When location is found
-  map.on('locationfound', async (e) => {
-    const userLat = e.latlng.lat;
-    const userLng = e.latlng.lng;
-
-    // Add current user marker (blue)
-    const userMarker = L.marker([userLat, userLng], { icon: blueIcon })
+    const listingMarker = L.marker([lat, lng], { icon: redIcon })
       .addTo(map)
-      .bindPopup("📍 You are here")
-      .openPopup();
+      .bindPopup(`<b>${title}</b><br>Destination`);
 
-    try {
-      // Request route from Geoapify
-      const url = `https://api.geoapify.com/v1/routing?waypoints=${userLat},${userLng}|${lat},${lng}&mode=drive&apiKey=${apiKey}`;
-      const routeRes = await fetch(url);
-      const routeData = await routeRes.json();
-      const feature = routeData?.features?.[0];
-      if (!feature?.geometry?.coordinates) return;
+    document.getElementById("locateBtn").addEventListener("click", () => {
+      console.log("📍 Locate button clicked — requesting location…");
+      map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
+    });
 
-      // Flatten nested coordinates
-      function flattenCoords(arr) {
-        const coords = [];
-        function recurse(a) {
-          if (!Array.isArray(a)) return;
-          if (a.length === 2 && typeof a[0] === 'number') coords.push([a[1], a[0]]);
-          else a.forEach(recurse);
+    map.on('locationfound', async (e) => {
+      console.log("✅ Location found:", e.latlng);
+
+      const userLat = e.latlng.lat;
+      const userLng = e.latlng.lng;
+
+      const accuracy = e.accuracy;
+      console.log(`📏 Location accuracy: ${accuracy} meters`);
+
+      const userMarker = L.marker([userLat, userLng], { icon: blueIcon })
+        .addTo(map)
+        .bindPopup("📍 You are here")
+        .openPopup();
+
+      try {
+        const url = `https://api.geoapify.com/v1/routing?waypoints=${userLat},${userLng}|${lat},${lng}&mode=drive&apiKey=${apiKey}`;
+        console.log("🛣️ Fetching route:", url);
+
+        const routeRes = await fetch(url);
+        const routeData = await routeRes.json();
+
+        console.log("📦 Route API Response:", routeData);
+
+        const feature = routeData?.features?.[0];
+        if (!feature?.geometry?.coordinates) {
+          console.warn("⚠️ No geometry found in route response.");
+          return;
         }
-        recurse(arr);
-        return coords;
+
+        // Flatten nested coordinates
+        function flattenCoords(arr) {
+          const coords = [];
+          function recurse(a) {
+            if (!Array.isArray(a)) return;
+            if (a.length === 2 && typeof a[0] === 'number') coords.push([a[1], a[0]]);
+            else a.forEach(recurse);
+          }
+          recurse(arr);
+          return coords;
+        }
+
+        const cleanCoords = flattenCoords(feature.geometry.coordinates);
+        console.log("🧭 Flattened coordinates count:", cleanCoords.length);
+
+        if (cleanCoords.length) {
+          const polyline = L.polyline(cleanCoords, { color: 'green', weight: 5, opacity: 0.7 }).addTo(map);
+          map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+        }
+
+        const distanceMeters = feature?.properties?.distance;
+        const distanceKm = (distanceMeters / 1000).toFixed(2);
+        console.log(`📐 Distance to listing: ${distanceKm} km`);
+
+        L.popup()
+          .setLatLng(cleanCoords[Math.floor(cleanCoords.length / 2)])
+          .setContent(`🚗 Distance: <b>${distanceKm} km</b>`)
+          .openOn(map);
+
+      } catch (err) {
+        console.error("❌ Routing API error:", err);
       }
+    });
 
-      const cleanCoords = flattenCoords(feature.geometry.coordinates);
-      if (cleanCoords.length) {
-        const polyline = L.polyline(cleanCoords, { color: 'green', weight: 5, opacity: 0.7 }).addTo(map);
-        map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-      }
-
-      // Show distance
-      const distanceMeters = feature?.properties?.distance;
-      const distanceKm = (distanceMeters / 1000).toFixed(2);
-      L.popup()
-        .setLatLng(cleanCoords[Math.floor(cleanCoords.length / 2)])
-        .setContent(`🚗 Distance: <b>${distanceKm} km</b>`)
-        .openOn(map);
-
-    } catch (err) {
-      console.error("Routing error:", err);
-    }
-  });
-
-  map.on('locationerror', e => console.warn("Location error:", e.message));
+    map.on('locationerror', e => {
+      console.warn("❌ Location error:", e.message);
+      console.log("🧩 Check if browser location permissions are granted.");
+    });
+  } catch (err) {
+    console.error("💥 Map init error:", err);
+  }
 }
+
 
   // --------------------- Review Form Validation ---------------------
   document.getElementById("reviewForm")?.addEventListener("submit", e => {

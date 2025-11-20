@@ -27,6 +27,10 @@ router.route("/login")
     userController.userLogin
   );
 
+
+router.get("/verify-otp", userController.renderOtpPage);
+router.post("/verify-otp", userController.verifyOtp);
+
 // Logout
 router.get("/logout", userController.userLogout);
 

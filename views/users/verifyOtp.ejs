@@ -1,0 +1,160 @@
+<% layout("./layouts/boilerplate.ejs") %>
+
+<div class="otp-bg d-flex justify-content-center align-items-center">
+
+  <div class="col-md-6 col-lg-4">
+
+    <div class="card otp-card shadow-lg rounded-4 border-0 p-5 animate__animated animate__fadeIn">
+
+      <!-- Heading -->
+      <h3 class="text-center mb-2 fw-bold text-primary">Verify OTP</h3>
+      <p class="text-center text-muted mb-4 small">
+        We’ve sent a 6-digit verification code to your email.
+      </p>
+
+      <!-- Flash Messages -->
+      <% if (error && error.length > 0) { %>
+        <div class="alert alert-danger py-2 text-center"><%= error %></div>
+      <% } %>
+    
+      <% if (success && success.length > 0) { %>
+        <div class="alert alert-success py-2 text-center"><%= success %></div>
+      <% } %>
+
+      <!-- OTP Form -->
+      <form action="/users/verify-otp" method="POST" id="otpForm">
+
+        <!-- OTP Boxes -->
+        <div class="otp-container mb-4">
+          <input type="text" maxlength="1" class="otp-input form-control" name="d1" required />
+          <input type="text" maxlength="1" class="otp-input form-control" name="d2" required />
+          <input type="text" maxlength="1" class="otp-input form-control" name="d3" required />
+          <input type="text" maxlength="1" class="otp-input form-control" name="d4" required />
+          <input type="text" maxlength="1" class="otp-input form-control" name="d5" required />
+          <input type="text" maxlength="1" class="otp-input form-control" name="d6" required />
+        </div>
+
+        <input type="hidden" id="otp" name="otp">
+
+        <!-- Buttons Section -->
+        <div class="d-flex flex-column gap-3 mt-3">
+          <button class="btn btn-gradient btn-lg w-100 fw-semibold">Verify OTP</button>
+          <a href="/users/signup" class="btn btn-outline-secondary btn-lg w-100 fw-semibold cancel-btn">Cancel</a>
+        </div>
+
+      </form>
+
+      <!-- Resend Link -->
+      <p class="text-center mt-3 small text-muted">
+        Didn’t receive the OTP?
+        <a href="/users/signup" class="text-primary fw-semibold text-decoration-none resend-link">
+          Resend OTP
+        </a>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+  /* Background */
+  .otp-bg {
+    min-height: 100vh;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
+  /* Card */
+  .otp-card {
+    backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    transition: 0.3s ease-in-out;
+  }
+
+  .otp-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  /* OTP Container */
+  .otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  /* OTP Inputs */
+  .otp-input {
+    width: 52px;
+    height: 62px;
+    font-size: 1.6rem;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid #d6e4ff;
+    background: #f7faff;
+    transition: 0.25s;
+  }
+
+  .otp-input:focus {
+    border-color: #156ef3;
+    background: white;
+    box-shadow: 0 0 10px rgba(21,110,243,0.25);
+  }
+
+  .otp-input:hover {
+    border-color: #8ab3ff;
+  }
+
+  /* Verify Button */
+  .btn-gradient {
+    background: linear-gradient(135deg, #156ef3, #2f85ff);
+    color: white;
+    border-radius: 50px;
+    padding: 0.75rem;
+    transition: 0.2s;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(21, 110, 243, 0.30);
+  }
+
+  /* Cancel Button */
+  .cancel-btn {
+    border-radius: 50px;
+    padding: 0.75rem;
+  }
+
+  .cancel-btn:hover {
+    background: #ebebeb;
+  }
+
+  /* Resend Link */
+  .resend-link:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  const inputs = document.querySelectorAll(".otp-input");
+  const hiddenOtp = document.getElementById("otp");
+
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      if (input.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+      hiddenOtp.value = Array.from(inputs).map(i => i.value).join("");
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+</script>

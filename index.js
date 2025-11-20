@@ -94,20 +94,13 @@ app.use((req, res, next) => {
     next();
 });
 
-/*
-app.get("/demouser" ,async (req, res) => {
-    let fakeUser = new User({
-        email : "xyz@gmail.com" ,
-        username :"delta"
-    });
-
-    let registeruser  = await User.register(fakeUser ,"helloworld");
-    res.send(registeruser);
-});*/
 
 app.get('/', (req, res) => {
-    res.redirect("/listings")
+    console.log("Redirecting to /listings...");
+    res.redirect("/listings");
 });
+
+
 app.use("/listings" ,listingRouter);
 app.use("/listings/:id/reviews/" ,reviewRouter );
 app.use("/users" , userRouter);
@@ -135,7 +128,7 @@ app.use( ( err , req ,res ,next) =>{
 
 
 
-app.listen(8080 , ()=>{
+app.listen(5000 , ()=>{
     console.log("server has started")
 });
 

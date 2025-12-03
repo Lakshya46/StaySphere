@@ -1,11 +1,11 @@
 <% layout("./layouts/boilerplate.ejs") %>
 
 <div class="row justify-content-center my-5">
-  <div class="col-md-6 col-lg-5">
-    <div class="card shadow-lg rounded-4 border-0 p-5 animate__animated animate__fadeIn">
+  <div class="col-md-5 col-lg-5">
+    <div class="card shadow-lg rounded-4 border-0 px-5 animate__animated animate__fadeIn">
       <!-- Heading -->
-      <h3 class="text-center mb-3 fw-bold text-primary">Sign Up for StaySphere</h3>
-      <p class="text-center text-muted mb-4 small">Create your account and find the best stays near you</p>
+      <h3 class="text-center mb-2 fw-bold text-primary">Sign Up for StaySphere</h3>
+      <p class="text-center text-muted mb-3 small">Create your account and find the best stays near you</p>
 
       <!-- Form -->
       <form action="/users/signup" method="post" class="needs-validation" novalidate>
@@ -13,34 +13,34 @@
         <!-- Username -->
         <div class="mb-3">
           <label for="username" class="form-label fw-semibold">Username *</label>
-          <input class="form-control form-control-lg" id="username" name="username" type="text" placeholder="Choose a username" required />
+          <input class="form-control form-control-lg" id="username" name="username" type="text" required />
           <div class="invalid-feedback">Please enter a valid username.</div>
         </div>
 
         <!-- Email -->
         <div class="mb-3">
           <label for="email" class="form-label fw-semibold">Email *</label>
-          <input class="form-control form-control-lg" id="email" name="email" type="email" placeholder="you@example.com" required />
+          <input class="form-control form-control-lg" id="email" name="email" type="email" required />
           <div class="invalid-feedback">Please enter a valid email.</div>
         </div>
 
         <!-- Password -->
         <div class="mb-3">
           <label for="password" class="form-label fw-semibold">Password *</label>
-          <input class="form-control form-control-lg" id="password" name="password" type="password" placeholder="Enter a secure password" required />
+          <input class="form-control form-control-lg" id="password" name="password" type="password"  required />
           <div class="invalid-feedback">Please enter a valid password.</div>
         </div>
 
         <!-- Full Name -->
         <div class="mb-3">
           <label for="name" class="form-label fw-semibold">Full Name</label>
-          <input class="form-control form-control-lg" id="name" name="name" type="text" placeholder="John Doe" />
+          <input class="form-control form-control-lg" id="name" name="name" type="text" />
         </div>
 
         <!-- Phone Number -->
         <div class="mb-4">
           <label for="phone" class="form-label fw-semibold">Phone Number</label>
-          <input class="form-control form-control-lg" id="phone" name="phone" type="text" placeholder="+91 9876543210" />
+          <input class="form-control form-control-lg" id="phone" name="phone" type="text"  />
         </div>
 
         <!-- Submit -->
@@ -62,7 +62,7 @@
 
   .card {
     border: none;
-    padding: 2.5rem 2rem;
+    padding: 1rem 2rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   .card:hover {

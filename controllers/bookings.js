@@ -40,8 +40,8 @@ module.exports.createBooking = async (req, res) => {
         req.flash("error", "This listing is already booked for the selected dates!");
         return res.redirect(`/listings/${id}`);
     }
-
-    const totalPrice = listing.price * nights;
+const dailyRate = listing.price / 30;
+    const totalPrice = dailyRate * nights;
 
     // Create booking with status "pending"
     const booking = new Booking({
@@ -111,7 +111,6 @@ module.exports.verifyPayment = async (req, res) => {
   const booking = await Booking.findById(bookingId);
   if (!booking) return res.status(404).send("Booking not found");
 
-  // MARK AS CONFIRMED
   booking.status = "confirmed";
   await booking.save();
 

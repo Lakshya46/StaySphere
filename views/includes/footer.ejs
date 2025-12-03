@@ -4,40 +4,39 @@
     <div class="row gy-4">
 
       <!-- Brand -->
-      <div class="col-md-3 text-center text-md-start">
+      <div class="col-md-4 text-center text-md-start">
         <h3 class="brand mb-3">StaySphere</h3>
         <p class="tagline mb-2">Smart stays for students & professionals</p>
-        <p class="text-muted small " style="color: #f8f9fa !important;">
-          Discover affordable, flexible, and unique stays designed for work, study, and leisure. 
+        <p class="text-muted small" style="color:#f8f9fa !important;">
+          Discover affordable, flexible, and unique stays designed for work, study, and leisure.
         </p>
       </div>
 
-      <!-- Quick Links -->
-      <div class="col-md-3 text-center text-md-start">
-        <h6 class="fw-bold text-white mb-3">Quick Links</h6>
+      <!-- Useful Links -->
+      <div class="col-md-4 text-center text-md-start">
+        <h6 class="fw-bold text-white mb-3">Navigation</h6>
         <ul class="footer-links list-unstyled">
-          <li><a href="/">Home</a></li>
+
           <li><a href="/listings">Browse Listings</a></li>
-          <li><a href="/users/myBookings">My Bookings</a></li>
-          <li><a href="/about">About Us</a></li>
+
+          <!-- If logged in as guest -->
+          <li><a href="/users/guest/bookings/upcoming">My Bookings</a></li>
+          <li><a href="/users/guest/wishlist">Wishlist</a></li>
+
+          <!-- Profile -->
+          <li><a href="/users/profile">My Profile</a></li>
+
+          <!-- Host-only links -->
+          <li><a href="/users/host/bookings/upcoming">Upcoming Guests</a></li>
+
         </ul>
       </div>
 
-      <!-- Support -->
-      <div class="col-md-3 text-center text-md-start">
-        <h6 class="fw-bold text-white mb-3">Support</h6>
-        <ul class="footer-links list-unstyled">
-          <li><a href="/help">Help Center</a></li>
-          <li><a href="/contact">Contact Us</a></li>
-          <li><a href="/faq">FAQs</a></li>
-          <li><a href="/terms">Terms & Conditions</a></li>
-        </ul>
-      </div>
-
-      <!-- Connect -->
-      <div class="col-md-3 text-center text-md-start">
+      <!-- Social -->
+      <div class="col-md-4 text-center text-md-start">
         <h6 class="fw-bold text-white mb-3">Connect</h6>
-        <p class="text-muted small " style="color: #f8f9fa !important;">Follow us on social media</p>
+        <p class="text-muted small" style="color:#f8f9fa !important;">Follow us on social media</p>
+
         <div class="socials d-flex gap-3 justify-content-center justify-content-md-start">
           <a href="#"><i class="fab fa-facebook-f"></i></a>
           <a href="#"><i class="fab fa-twitter"></i></a>
@@ -58,61 +57,36 @@
 </footer>
 
 <style>
-  /* Footer Gradient Background */
   .footer-modern {
-    background: linear-gradient(135deg, #156ef3, #2f85ff);
+    background: linear-gradient(135deg,#156ef3,#2f85ff);
     color: #fff;
     box-shadow: 0 -2px 20px rgba(0,0,0,0.15);
   }
+  .footer-modern .brand { font-weight:700; font-size:1.5rem; color:#fff; }
+  .footer-modern .tagline { font-size:1rem; font-weight:500; color:#f8f9fa; }
 
-  .footer-modern .brand {
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: #fff;
-  }
-
-  .footer-modern .tagline {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #f8f9fa;
-  }
-
-  /* Links */
   .footer-links a {
-    color: #eeeeee;
-    text-decoration: none !important; /* remove underline */
-    font-size: 0.95rem;
-    display: block;
-    margin-bottom: 8px;
-    transition: color 0.3s ease;
+    color:#eeeeee;
+    text-decoration:none !important;
+    font-size:0.95rem;
+    display:block;
+    margin-bottom:8px;
+    transition:color 0.3s ease;
   }
-  .footer-links a:hover {
-    color: #fff;
-  }
+  .footer-links a:hover { color:#fff; }
 
-  /* Social Icons */
   .socials a {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none; /* no underline */
+    width:40px; height:40px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.15);
+    color:#fff; font-size:1rem;
+    transition:all 0.3s ease;
+    text-decoration:none;
   }
   .socials a:hover {
-    background: #fff;
-    color: #0d6efd;
-    transform: translateY(-3px);
+    background:#fff; color:#0d6efd;
+    transform:translateY(-3px);
   }
 
-  hr {
-    opacity: 0.3;
-  }
-
- 
+  hr { opacity:0.3; }
 </style>

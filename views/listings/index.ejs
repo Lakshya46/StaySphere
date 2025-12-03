@@ -2,10 +2,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <body class="bg-light">
-  <div class="container py-5">
+  <div class="container py-3">
 
     <!-- Heading -->
-    <div class="text-center mb-5">
+    <div class="text-center mb-4">
       <h2 class="fw-bold">Explore Stays</h2>
       <p class="text-muted">Find your perfect stay for students and professionals at the best prices</p>
     </div>
@@ -45,7 +45,7 @@
           <label class="form-label">Property Type</label>
           <select class="form-select" name="propertyType" id="propertyType">
             <option value="">Any</option>
-            <% ["Flat", "PG", "Studio"].forEach(type => { %>
+            <% ["Flat", "PG", "Studio/1RK"].forEach(type => { %>
               <option value="<%= type %>" <%= query?.propertyType === type ? 'selected' : '' %>><%= type %></option>
             <% }) %>
           </select>
@@ -56,7 +56,7 @@
           <label class="form-label">BHK Type</label>
           <select class="form-select" name="bhkType" id="bhkType">
             <option value="">Any</option>
-            <% ["1BHK", "2BHK", "3BHK", "4BHK+", "Studio"].forEach(type => { %>
+            <% ["1BHK", "2BHK", "3BHK", "More"].forEach(type => { %>
               <option value="<%= type %>" <%= query?.bhkType === type ? 'selected' : '' %>><%= type %></option>
             <% }) %>
           </select>
@@ -89,13 +89,15 @@
               <label class="form-check-label"><%= a %></label>
             </div>
           <% }) %>
-        </div>
 
-        <!-- Buttons -->
-        <div class="col-12 text-end">
+            <!-- Buttons -->
+          <div class="col-12 text-end">
           <button type="submit" class="btn btn-primary">Search / Filter</button>
           <a href="/listings" class="btn btn-outline-secondary ms-2">Reset</a>
         </div>
+        </div>
+
+        
       </form>
     </div>
 
@@ -151,7 +153,7 @@
                     <% } %>
 <% if (list.propertyType === 'Flat' && list.bhkType) { %>                      <span class="badge bg-primary me-1"><i class="fa-solid fa-bed me-1"></i> <%= list.bhkType %></span>
                     <% } %>
-                    <span class="badge bg-success">₹ <%= list.price?.toLocaleString("en-IN") || 'N/A' %> / Day</span>
+                    <span class="badge bg-success">₹ <%= list.price?.toLocaleString("en-IN") || 'N/A' %> / Month </span>
                   </div>
 
                   <p class="text-secondary small mb-0">
@@ -236,6 +238,7 @@
       });
     });
   </script>
+
 
   <style>
     .hover-scale:hover {

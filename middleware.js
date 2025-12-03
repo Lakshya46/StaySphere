@@ -66,3 +66,13 @@ module.exports.validateListing   = ( req ,res ,next) => {
         next();
     }
 }
+
+module.exports.isHost = async (req, res, next) => {
+  const hostListings = await Listing.find({ owner: req.user._id });
+  if (!hostListings.length) {
+    req.flash("error", "You have no listings yet.");
+    return res.redirect("/users/profile");
+  }
+  req.hostListings = hostListings;
+  next();
+};

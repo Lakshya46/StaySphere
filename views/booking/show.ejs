@@ -1,20 +1,20 @@
 <% layout("./layouts/boilerplate") %>
 
-<div class="container my-5">
+<div class="container my-2">
   <div class="booking-card mx-auto shadow-lg border-0 rounded-4 overflow-hidden">
 
     <!-- Header -->
-    <div class="booking-header text-white text-center py-5">
+    <div class="booking-header text-white text-center py-4">
       <h3 class="fw-bold mb-2"><i class="fas fa-receipt me-2"></i>Booking Summary</h3>
-      <p class="mb-0 small text-light opacity-75">Thank you for choosing StaySphere</p>
+      <p class="mb-0 small text-light opacity-90">Thank you for choosing StaySphere</p>
     </div>
 
     <!-- Body -->
-    <div class="booking-body p-4 p-md-5">
+    <div class="booking-body p-3 p-md-3">
 
       <!-- Listing Image -->
       <% if (booking.listing.featuredImage?.url) { %>
-        <div class="text-center mb-4">
+        <div class="text-center mb-3">
           <img src="<%= booking.listing.featuredImage.url %>" 
                alt="<%= booking.listing.title %>"
                class="listing-image shadow-sm rounded-4">
@@ -22,7 +22,7 @@
       <% } %>
 
       <!-- Listing Details -->
-      <div class="text-center mb-5">
+      <div class="text-center mb-3">
         <h4 class="fw-bold text-primary mb-1"><%= booking.listing.title %></h4>
         <p class="text-muted mb-1">
           <i class="fas fa-map-marker-alt text-danger me-1"></i>
@@ -30,15 +30,12 @@
         </p>
         <% if (booking.listing.pincode) { %>
           <p class="text-muted small mb-0">
-            <i class="fas fa-location-pin me-1 text-secondary"></i>
             Pincode: <%= booking.listing.pincode %>
           </p>
         <% } %>
       </div>
 
-      <!-- Booking Info Grid -->
-      <div class="row g-4 mb-5 justify-content-center">
-        <% const details = [
+      <% const details = [
           { icon: 'fa-user', label: 'Guest Name', value: booking.user.username },
           { icon: 'fa-users', label: 'Guests', value: booking.guests },
           { icon: 'fa-calendar-check', label: 'Check-In', value: booking.startDate.toDateString() },
@@ -46,22 +43,27 @@
           { icon: 'fa-money-bill-wave', label: 'Total Price', value: `₹${booking.totalPrice.toLocaleString()}` },
           { icon: 'fa-info-circle', label: 'Status', value: booking.status.charAt(0).toUpperCase() + booking.status.slice(1) }
         ]; %>
+      <!-- Booking Info Grid -->
+      <div class="row g-3 mb-5 justify-content-center">
+  <% details.forEach(d => { %>
+    <div class="col-6 col-md-4">
+      <div class="info-card p-3 rounded-4 shadow-sm h-100 d-flex align-items-center gap-3">
+        <div class="icon-circle">
+          <i class="fas <%= d.icon %>"></i>
+        </div>
 
-        <% details.forEach(d => { %>
-          <div class="col-12 col-sm-6 col-lg-4">
-            <div class="info-card text-center p-4 rounded-4 shadow-sm h-100">
-              <div class="icon-circle mb-3">
-                <i class="fas <%= d.icon %>"></i>
-              </div>
-              <h6 class="fw-semibold text-dark"><%= d.label %></h6>
-              <p class="fw-bold text-secondary mb-0"><%= d.value %></p>
-            </div>
-          </div>
-        <% }) %>
+        <div class="info-text">
+          <h6 class="fw-semibold text-dark mb-1"><%= d.label %></h6>
+          <p class="fw-bold text-secondary mb-0"><%= d.value %></p>
+        </div>
       </div>
+    </div>
+  <% }) %>
+</div>
+
 
       <!-- Contact Info -->
-      <div class="text-center mb-5">
+      <div class="text-center mb-4">
         <% if (booking.listing.owner._id.equals(currentUser._id)) { %>
           <h5 class="fw-bold text-dark mb-3"><i class="fas fa-user me-2 text-primary"></i>Guest Contact Info</h5>
           <div class="contact-info d-flex justify-content-center gap-4 flex-wrap">
@@ -156,7 +158,7 @@ body {
 }
 </style>
 
-<!-- ✅ Razorpay Payment Integration -->
+<!--  Razorpay Payment Integration -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 document.getElementById("rzp-button")?.addEventListener("click", async () => {
@@ -188,9 +190,9 @@ document.getElementById("rzp-button")?.addEventListener("click", async () => {
         });
         const data = await verifyRes.json();
         if (data.success) {
-          alert("✅ Payment successful!");
+          alert("Payment successful!");
           window.location.reload();
-        } else alert("❌ Payment verification failed!");
+        } else alert(" Payment verification failed!");
       },
       theme: { color: "#008cff" },
     };

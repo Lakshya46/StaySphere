@@ -11,14 +11,14 @@
     </div>
   <% } else { %>
 
-    <!-- 🖥️ Desktop View -->
+    <!--  Desktop View -->
     <div class="d-none d-md-block">
       <% bookings.forEach(b => { %>
         <div class="d-flex shadow-sm rounded-4 overflow-hidden mb-3 p-3 align-items-center card-row"
              onclick="window.location.href='/listings/<%= b.listing._id %>/booking/<%= b._id %>'"
              style="cursor:pointer;">
           
-          <!-- 👤 Guest -->
+          <!--  Guest -->
           <div class="col-md-2 d-flex align-items-center gap-2">
             <img 
               src="<%= b.user.avatar || 'https://i.ibb.co/2FxW9Nz/default-avatar.png' %>" 
@@ -28,7 +28,7 @@
             <span class="fw-semibold text-dark"><%= b.user.username %></span>
           </div>
 
-          <!-- 🏠 Property -->
+          <!--  Property -->
           <div class="col-md-3 d-flex align-items-center gap-3">
             <% if (b.listing.featuredImage) { %>
               <img 
@@ -45,19 +45,19 @@
             <span class="fw-semibold text-dark"><%= b.listing.title %></span>
           </div>
 
-          <!-- 📅 Start -->
+          <!-- Start -->
           <div class="col-md-2 d-flex align-items-center text-secondary">
             <i class="fas fa-calendar-check me-1 text-primary"></i>
             <%= new Date(b.startDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
           </div>
 
-          <!-- 📆 End -->
+          <!-- End -->
           <div class="col-md-2 d-flex align-items-center text-secondary">
             <i class="fas fa-calendar-times me-1 text-danger"></i>
             <%= new Date(b.endDate).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
           </div>
 
-          <!-- 💰 Price -->
+          <!--  Price -->
           <div class="col-md-2 fw-bold text-success d-flex align-items-center">
             ₹<%= b.totalPrice.toLocaleString("en-IN") %>
           </div>
@@ -74,7 +74,7 @@
       <% }) %>
     </div>
 
-    <!-- 📱 Mobile View -->
+    <!-- Mobile View -->
     <div class="d-block d-md-none">
       <% bookings.forEach(b => { %>
         <div class="card mb-3 shadow-sm rounded-4 p-3" 

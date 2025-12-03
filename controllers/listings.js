@@ -1,5 +1,5 @@
 const Listing = require("../models/listing");
-const Booking = require("../models/booking"); // Add Booking model
+const Booking = require("../models/booking"); 
 const Review = require("../models/review");
 const ExpressError = require("../utils/ExpressError");
 const { listingSchema, reviewSchema } = require("../schema");
@@ -30,37 +30,36 @@ module.exports.index = async (req, res) => {
 
     let query = {};
 
-    // 🔍 Title / Search
+    //  Title / Search
     if (q) query.title = { $regex: q, $options: "i" };
 
-    // 📍 City / Area / Pincode
+    // City / Area / Pincode
     if (city) query.city = { $regex: city, $options: "i" };
     if (area) query.area = { $regex: area, $options: "i" };
     if (pincode) query.pincode = pincode;
 
-    // 💰 Price range
+    //  Price range
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    // 🏠 Property Type & BHK
+    // Property Type & BHK
     if (propertyType) query.propertyType = propertyType;
     if (propertyType === "Flat" && bhkType) query.bhkType = bhkType;
 
-    // ✅ Amenities
+    //  Amenities
     if (amenities) {
       const amenityArray = Array.isArray(amenities) ? amenities : [amenities];
       query.amenities = { $all: amenityArray };
     }
 
-    // 🗓️ Base query fetch (without availability filtering yet)
+    // Base query fetch (without availability filtering yet)
     let allListing = await Listing.find(query);
 
-    // 🗓️ Filter by availability date range if provided
-   // 🗓️ Filter listings by availability date range
-// 🗓️ Filter listings by availability date range
+    // Filter by availability date range if provided
+
 if (availableFrom || availableTo) {
   const from = availableFrom ? new Date(availableFrom) : null;
   const to = availableTo ? new Date(availableTo) : null;
@@ -69,7 +68,7 @@ if (availableFrom || availableTo) {
   if (from && to && !isNaN(from) && !isNaN(to)) {
     // Find all confirmed bookings that overlap with requested date range
     const overlappingBookings = await Booking.find({
-      status: "confirmed", // ✅ Only confirmed bookings
+      status: "confirmed", // Only confirmed bookings
       $or: [
         { startDate: { $lte: to }, endDate: { $gte: from } }, // overlapping dates
       ],
@@ -87,7 +86,7 @@ if (availableFrom || availableTo) {
 
 
 
-    // 📍 Nearby filter using Haversine formula
+    //  Nearby filter using Haversine formula
     if (nearby && lat && lng) {
       const userLat = parseFloat(lat);
       const userLng = parseFloat(lng);
@@ -111,14 +110,14 @@ if (availableFrom || availableTo) {
       });
     }
 
-    // 💖 Wishlist data if user logged in
+    // Wishlist data if user logged in
     let wishlist = [];
     if (req.user) {
       const user = await User.findById(req.user._id);
       wishlist = user.wishlist.map((id) => id.toString());
     }
 
-    // 🚫 No results check
+    //  No results check
     const noResults = allListing.length === 0;
 
     res.render("listings/index.ejs", { allListing, query: req.query, wishlist, noResults });
@@ -190,12 +189,12 @@ module.exports.createNewListing = async (req, res) => {
 
     await newListing.save();
 
-    req.flash("success", "✅ New listing created successfully!");
+    req.flash("success", " New listing created successfully!");
     res.redirect("/listings");
 
   } catch (err) {
     console.error("Error creating listing:", err);
-    req.flash("error", "❌ Failed to create listing. Please try again.");
+    req.flash("error", " Failed to create listing. Please try again.");
     res.redirect("/listings/new");
   }
 };
@@ -213,7 +212,7 @@ module.exports.renderShowListing = async (req, res) => {
       });
 
     if (!listing) {
-      req.flash("error", "❌ Listing not found or has been removed.");
+      req.flash("error", " Listing not found or has been removed.");
       return res.redirect("/listings");
     }
 
@@ -224,7 +223,7 @@ module.exports.renderShowListing = async (req, res) => {
     res.render("listings/show.ejs", { listing, currentuser });
   } catch (err) {
     console.error("Error rendering listing:", err);
-    req.flash("error", "⚠️ Unable to load listing. Please try again later.");
+    req.flash("error", "Unable to load listing. Please try again later.");
     res.redirect("/listings");
   }
 };
@@ -260,6 +259,14 @@ module.exports.updateListing = async (req, res) => {
 
   // Update other fields
   Object.assign(listing, otherFields);
+ 
+// ALWAYS remove invalid/empty BHK when property is not Flat
+if (listing.propertyType !== "Flat") {
+  listing.bhkType = undefined;
+}
+
+
+
 
   // Conditionally update bedrooms & bathrooms
   if (listing.propertyType === "Flat") {

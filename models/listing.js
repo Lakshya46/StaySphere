@@ -45,7 +45,7 @@ const listingSchema = new Schema(
     },
     bhkType: {
       type: String,
-      enum: ["1BHK", "2BHK", "3BHK", "4BHK+", "Studio", "More"],
+      enum: ["1BHK", "2BHK", "3BHK",  "More"],
       required: function () {
         return this.propertyType === "Flat";
       },

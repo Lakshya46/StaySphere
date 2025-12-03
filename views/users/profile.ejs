@@ -66,18 +66,35 @@
     display:flex; flex-wrap:wrap; gap:2rem; justify-content:center; margin-top:2rem;
   }
   .meter-card, .revenue-charts {
-    flex:1 1 300px; background:#fff; border-radius:1rem; padding:2rem; text-align:center;
+    flex:1 1 300px; background:#fff; border-radius:1rem; padding: 1rem; text-align:center;
     box-shadow:0 6px 20px rgba(0,0,0,0.06); transition:all 0.3s;
   }
-  .meter-card:hover, .revenue-charts:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(0,0,0,0.12); }
+  .meter-card:hover, .revenue-charts:hover { transform:translateY(-1px); box-shadow:0 12px 30px rgba(0,0,0,0.12); }
   .meter-card h6, .revenue-charts h6 { color:#008cff; font-weight:600; margin-bottom:1rem; }
   .meter-card canvas, .revenue-charts canvas { width:100% !important; height:280px !important; }
+  .meter-card {
+  padding: 0.5rem;   /* reduce outer padding */
+}
 
-  @media (max-width:768px) {
-    .metric-card, .meter-card, .revenue-charts { flex:1 1 100%; max-width:500px; }
-    .charts-row { flex-direction:column; align-items:center; }
+
+.meter-card canvas {
+  height: 180px !important;  /* reduce chart height */
+  width: 180px !important;  
+   margin: 0 auto;          /* ensure canvas is centered */
+  display: block; /* reduce width */
+}
+
+  
+
+  @media (max-width: 768px) {
+  .meter-card canvas {
+    width: 260px !important;
+    height: 260px !important;
   }
+  
+}
 </style>
+
 
 <div class="profile-container">
   <div class="row g-4 justify-content-center">
@@ -112,7 +129,7 @@
     </div>
 
     <!-- Metrics Row -->
-    <div class="col-12 mt-4">
+    <div class="col-12 mt-2">
       <div class="metrics-row">
         <div class="metric-card" onclick="window.location.href='/users/host/properties'">
           <h6>Total Properties</h6>
@@ -139,7 +156,7 @@
     </div>
 
     <!-- Charts Row -->
-    <div class="col-12 mt-4">
+    <div class="col-12 mt-3">
       <div class="charts-row">
         <div class="meter-card">
           <h6>Occupancy Rate</h6>
@@ -161,7 +178,7 @@
           <canvas id="revenuePieChart"></canvas>
         </div>
         <div class="revenue-charts">
-          <h6>Revenue (₹) by Property</h6>
+          <h6 ">Revenue (₹) by Property</h6>
           <canvas id="revenueBarChart"></canvas>
         </div>
       </div>
@@ -172,7 +189,64 @@
 <div id="dashboardData" data-json='<%= JSON.stringify(dashboard || {}) %>' style="display:none;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+Chart.register({
+  id: 'centerText',
+  afterDraw(chart) {
+    // Apply ONLY to doughnut charts AND only to meter charts
+    const meterIDs = ["occupancyMeter", "completedMeter", "cancelledMeter"];
+
+    if (
+      chart.config.type !== "doughnut" ||
+      !meterIDs.includes(chart.canvas.id)
+    ) return;
+
+    const { ctx, chartArea: { width, height } } = chart;
+
+    const value = chart.config.data.datasets[0].data[0]; // percent value
+    const text = value + "%";
+
+    ctx.save();
+    ctx.font = "bold 22px Segoe UI";
+    ctx.fillStyle = "#333";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, width / 2, height / 2);
+    ctx.restore();
+  }
+});
+</script>
+
+
+<script>
+Chart.register({
+  id: 'barValueLabels',
+  afterDatasetsDraw(chart, args, pluginOptions) {
+    const { ctx } = chart;
+
+    chart.data.datasets.forEach((dataset, i) => {
+      const meta = chart.getDatasetMeta(i);
+
+      if (!meta.hidden && meta.type === 'bar') {
+        meta.data.forEach((bar, index) => {
+          const value = dataset.data[index];
+          ctx.save();
+          ctx.font = 'bold 12px Segoe UI';
+          ctx.fillStyle = '#333';
+          ctx.textAlign = 'center';
+          ctx.fillText(`₹${value}`, bar.x, bar.y - 8);
+          ctx.restore();
+        });
+      }
+    });
+  }
+});
+</script>
+
+<script>
+
+
 document.addEventListener('DOMContentLoaded', function(){
   const dashboardData = JSON.parse(document.getElementById('dashboardData').dataset.json || '{}');
 
@@ -182,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function(){
     gradient.addColorStop(0,colors[0]); gradient.addColorStop(1,colors[1]);
     return new Chart(ctx,{
       type:'doughnut',
-      data:{ labels:[label,'Remaining'], datasets:[{data:[value,100-value], backgroundColor:[gradient,'#eee'], borderWidth:2}] },
+      data:{ labels:[label,'Remaining'], datasets:[{data:[value,100-value], backgroundColor:[gradient,'#eee'], borderWidth:1}] },
       options:{ cutout:'70%', plugins:{legend:{display:false}, tooltip:{enabled:true}} }
     });
   }
@@ -221,7 +295,12 @@ document.addEventListener('DOMContentLoaded', function(){
       responsive:true,
       maintainAspectRatio:false,
       plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true}}
+      scales:{y:{beginAtZero:true}},
+       layout: {
+    padding: {
+      top: 30   
+    }
+  }
     }
   });
 });

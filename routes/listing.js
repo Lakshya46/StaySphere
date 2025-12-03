@@ -4,7 +4,7 @@ const wrapAsync = require("../utils/wrapAsync");
 const middleware = require("../middleware");
 const listingController = require("../controllers/listings");
 const multer = require("multer");
-const { storage } = require("../cloudConfig");
+const { storage } = require("../config/cloudConfig");
 const upload = multer({ storage });
 
 // ---------- LISTING ROUTES ---------- //

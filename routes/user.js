@@ -6,9 +6,8 @@ const multer = require("multer");
 const wrapAsync = require("../utils/wrapAsync");
 const middleware = require("../middleware");
 const userController = require("../controllers/users");
-const { storage } = require("../cloudConfig"); // Cloudinary storage
+const { storage } = require("../config/cloudConfig"); // Cloudinary storage
 const upload = multer({ storage });
-const Listing = require("../models/listing"); // ADD THIS
 
 // =======================
 // AUTH ROUTES
@@ -30,6 +29,7 @@ router.route("/login")
 
 router.get("/verify-otp", userController.renderOtpPage);
 router.post("/verify-otp", userController.verifyOtp);
+router.post("/resend-otp", userController.resendOtp);
 
 // Logout
 router.get("/logout", userController.userLogout);
@@ -72,24 +72,14 @@ router.get("/guest/bookings/history", middleware.isLogged, wrapAsync(userControl
 // HOST ACTIONS
 // =======================
 
-// Middleware to check if user has host listings
-const isHost = async (req, res, next) => {
-  const hostListings = await Listing.find({ owner: req.user._id });
-  if (!hostListings.length) {
-    req.flash("error", "You have no listings yet.");
-    return res.redirect("/users/profile");
-  }
-  req.hostListings = hostListings;
-  next();
-};
 
 // All Listed Properties
-router.get("/host/properties", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostProperties));
+router.get("/host/properties", middleware.isLogged, wrapAsync(middleware.isHost), wrapAsync(userController.renderHostProperties));
 
 // Upcoming Guests
-router.get("/host/bookings/upcoming", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostUpcomingBookings));
+router.get("/host/bookings/upcoming", middleware.isLogged, wrapAsync(middleware.isHost), wrapAsync(userController.renderHostUpcomingBookings));
 
 // Past Guests
-router.get("/host/bookings/history", middleware.isLogged, wrapAsync(isHost), wrapAsync(userController.renderHostBookingHistory));
+router.get("/host/bookings/history", middleware.isLogged, wrapAsync(middleware.isHost), wrapAsync(userController.renderHostBookingHistory));
 
 module.exports = router;

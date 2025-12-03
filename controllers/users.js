@@ -138,6 +138,41 @@ module.exports.verifyOtp = async (req, res, next) => {
   }
 };
 
+
+module.exports.resendOtp = async (req, res) => {
+  try {
+    if (!req.session.tempUser) {
+      req.flash("error", "Session expired. Please signup again.");
+      return res.redirect("/users/signup");
+    }
+
+    // Generate new OTP
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    // Update OTP & expiry
+    req.session.tempUser.otp = otp;
+    req.session.tempUser.otpExpiry = Date.now() + 5 * 60 * 1000;
+
+    // Send email
+    await sendMail(req.session.tempUser.email, otp);
+
+    console.log("Resent OTP:", otp);
+
+    req.flash("success", "A new OTP has been sent to your email.");
+    return res.redirect("/users/verify-otp");
+
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not resend OTP. Try again.");
+    return res.redirect("/users/verify-otp");
+  }
+};
+
 module.exports.renderLogin = (req, res) => {
   res.render("users/login");
 };

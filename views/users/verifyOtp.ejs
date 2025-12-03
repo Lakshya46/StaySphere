@@ -12,10 +12,7 @@
         We’ve sent a 6-digit verification code to your email.
       </p>
 
-      <!-- Flash Messages -->
-      <% if (error && error.length > 0) { %>
-        <div class="alert alert-danger py-2 text-center"><%= error %></div>
-      <% } %>
+    
     
       <% if (success && success.length > 0) { %>
         <div class="alert alert-success py-2 text-center"><%= success %></div>
@@ -47,9 +44,15 @@
       <!-- Resend Link -->
       <p class="text-center mt-3 small text-muted">
         Didn’t receive the OTP?
-        <a href="/users/signup" class="text-primary fw-semibold text-decoration-none resend-link">
-          Resend OTP
-        </a>
+       
+       <form action="/users/resend-otp" method="POST" class="text-center mt-2">
+  <button class="btn btn-link p-0 text-primary fw-semibold text-decoration-none"
+          style="font-size: 0.9rem;" type="submit">
+    Resend OTP
+  </button>
+</form>
+
+
       </p>
 
     </div>

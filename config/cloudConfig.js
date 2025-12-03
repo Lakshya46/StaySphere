@@ -10,8 +10,8 @@ cloudinary.config({
 });
 
 cloudinary.api.ping()
-  .then(result => console.log("✅ Cloudinary connected:", result))
-  .catch(err => console.error("❌ Cloudinary connection failed:", err));
+  .then(result => console.log("Cloudinary connected:", result))
+  .catch(err => console.error(" Cloudinary connection failed:", err));
 
 const storage = new CloudinaryStorage({
    cloudinary,

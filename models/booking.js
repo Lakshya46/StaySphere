@@ -23,14 +23,6 @@ const bookingSchema = new Schema(
 );
 
 // Pre-save hook: calculate totalPrice based on Listing rent
-bookingSchema.pre("save", async function(next) {
-  const listing = await mongoose.model("Listing").findById(this.listing);
-  if (listing) {
-    const days = Math.max(Math.ceil((this.endDate - this.startDate)/(1000*60*60*24)), 1);
-    this.totalPrice = listing.price * days; // use 'price' instead of 'rent'
-  }
-  next();
-});
 
 
 const Booking = mongoose.model("Booking", bookingSchema);

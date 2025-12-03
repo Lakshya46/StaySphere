@@ -36,6 +36,7 @@ module.exports.userSignup = async (req, res, next) => {
     }
 
     // 1️⃣ Generate OTP (numeric only)
+    /*
 const otp = otpGenerator.generate(6, {
   digits: true,
   lowerCaseAlphabets: false,
@@ -62,7 +63,17 @@ const otp = otpGenerator.generate(6, {
     await sendMail(email, otp);
 
     req.flash("success", "OTP sent to your email");
-    return res.redirect("/users/verify-otp");
+    return res.redirect("/users/verify-otp");*/
+
+    const newUser = new User({ username, email, phone, name });
+    const registeredUser = await User.register(newUser, password);
+
+    req.login(registeredUser, (err) => {
+      if (err) return next(err);
+
+      req.flash("success", "Account created successfully!");
+      return res.redirect("/listings");
+    });
 
   } catch (err) {
     console.error(err);

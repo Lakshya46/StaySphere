@@ -123,7 +123,7 @@ app.use( ( err , req ,res ,next) =>{
      res.render("error.ejs" , { err});
 });
 
-
+console.log("succes");
 
 const PORT = process.env.PORT || 8080;
 

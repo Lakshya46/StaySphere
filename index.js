@@ -112,7 +112,7 @@ app.get("/api/geoapify-key", (req, res) => {
 });
 
 
-
+console.log("test")
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page not found"));
 });
